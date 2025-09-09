@@ -45,7 +45,7 @@ if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none"]
 
 #【画像】電荷の色表示
-charge_type=st.session_state["charge_type"]
+charge_type=st.session_state["charge_type"][0]
 charge_image=f"assets/{charge_type}.png"
 st.image(Image.open(charge_image),width=128)
 
@@ -65,12 +65,12 @@ st.markdown("""
             """,unsafe_allow_html=True)
 #機能(無→赤→青→無で切り替え)
 if st.button("切り替え"):
-    if st.session_state["charge_type"]==["none"]:
-        st.session_state["charge_type"]=["red"]
-    elif st.session_state["charge_type"]==["red"]:
-        st.session_state["charge_type"]=["blue"]
+    if st.session_state["charge_type"][0]==["none"]:
+        st.session_state["charge_type"][0]=["red"]
+    elif st.session_state["charge_type"][0]==["red"]:
+        st.session_state["charge_type"][0]=["blue"]
     else:
-        st.session_state["charge_type"]=["none"]
+        st.session_state["charge_type"][0]=["none"]
 
 #【画像】枠の表示
 st.image("https://github.com/may-hatch/IDV_hermitCalc/blob/main/assets/frame.png",width=128)
@@ -79,7 +79,7 @@ st.image("https://github.com/may-hatch/IDV_hermitCalc/blob/main/assets/frame.png
 st.write(st.session_state["hp_show"])
 #【画像】hpゲージの表示
 #プログレスバーを縦向きに変更...はいったん保留
-hp=st.session_state["hp_show"]
+hp=st.session_state["hp_show"][0]
 st.markdown(f"""
             <style>
             .hp-bar{{
@@ -94,14 +94,14 @@ st.image("hp_show.png",width=128)
 
 #攻撃ボタン(通常攻撃→1250)
 if st.button("攻撃"):
-    st.session_state["hp"]+=1250
-    st.session_state["hp_show"]=round(st.session_state["hp"]/1000,2)
+    st.session_state["hp"][0]+=1250
+    st.session_state["hp_show"][0]=round(st.session_state["hp"][0]/1000,2)
 #恐怖の一撃ボタン(1250+1000)
 if st.button("恐怖"):
-    st.session_state["hp"]+=2250
-    st.session_state["hp_show"]=round(st.session_state["hp"]/1000,2)
+    st.session_state["hp"][0]+=2250
+    st.session_state["hp_show"][0]=round(st.session_state["hp"][0]/1000,2)
 
 #治療ボタン(汎用性の都合で500ずつ)
 if st.button("治療"):
-    st.session_state["hp"]-=500
-    st.session_state["hp_show"]=round(st.session_state["hp"]/1000,2)
+    st.session_state["hp"][0]-=500
+    st.session_state["hp_show"][0]=round(st.session_state["hp"][0]/1000,2)
