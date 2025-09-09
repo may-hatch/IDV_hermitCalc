@@ -53,24 +53,24 @@ st.image(Image.open(charge_image),width=128)
 #透明化
 st.markdown("""
             <style>
-            div.stbutton > button{
-            backgrond-color:rgba(0,0,0,0);
+            div.stbutton > stbutton{
+            background-color:rgba(0,0,0,0);
             color:transparent;
-            boder:none
-            height:128px
+            border:none;
+            height:128px;
             width:128px;
-            cursor:pointer:
+            cursor:pointer;
             }
             </style>
             """,unsafe_allow_html=True)
 #機能(無→赤→青→無で切り替え)
-if st.button("切り替え"):
-    if st.session_state["charge_type"][0]==["none"]:
-        st.session_state["charge_type"][0]=["red"]
-    elif st.session_state["charge_type"][0]==["red"]:
-        st.session_state["charge_type"][0]=["blue"]
+if st.button(""):
+    if st.session_state["charge_type"][0]=="none":
+        st.session_state["charge_type"][0]="red"
+    elif st.session_state["charge_type"][0]=="red":
+        st.session_state["charge_type"][0]="blue"
     else:
-        st.session_state["charge_type"][0]=["none"]
+        st.session_state["charge_type"][0]="none"
 
 #【画像】枠の表示
 st.image("assets/frame.png",width=128)
