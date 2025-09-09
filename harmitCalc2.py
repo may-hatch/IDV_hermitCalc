@@ -52,19 +52,19 @@ st.image(Image.open(charge_image),width=128)
 #電荷切り替えボタン
 #透明化
 st.markdown("""
-            <style>
-            div.stbutton > stbutton{
+    <style>
+    div.stbutton > stbutton{
             background-color:rgba(0,0,0,0);
             color:transparent;
             border:none;
             height:128px;
             width:128px;
             cursor:pointer;
-            }
-            </style>
-            """,unsafe_allow_html=True)
+    }
+    </style>
+""",unsafe_allow_html=True)
 #機能(無→赤→青→無で切り替え)
-if st.button(""):
+if st.button("",key="charge_button_1"):
     if st.session_state["charge_type"][0]=="none":
         st.session_state["charge_type"][0]="red"
     elif st.session_state["charge_type"][0]=="red":
@@ -73,7 +73,7 @@ if st.button(""):
         st.session_state["charge_type"][0]="none"
 
 #【画像】枠の表示
-st.image("assets/frame.png",width=128)
+st.image(Image.open("assets/frame.png"),width=128)
 
 #HP数値の表示
 st.write(st.session_state["hp_show"])
@@ -81,16 +81,16 @@ st.write(st.session_state["hp_show"])
 #プログレスバーを縦向きに変更...はいったん保留
 hp=st.session_state["hp_show"][0]
 st.markdown(f"""
-            <style>
-            .hp-bar{{
-            height:{round(hp*64)}px;
-            width:40px;
-            object-fit:cover;
-            }}
-            </style>
-            <img src="assets/hp_show.png" class="hp_bar">
-            """,unsafe_allow_html=True)
-st.image("hp_show.png",width=128)
+    <style>
+    .hp-bar{{
+        height:{round(hp*64)}px;
+        width:40px;
+        object-fit:cover;
+    }}
+    </style>
+    <img src="assets/hp_show.png" class="hp_bar">
+""",unsafe_allow_html=True)
+st.image(Image.open("assets/hp_show.png"),width=128)
 
 #攻撃ボタン(通常攻撃→1250)
 if st.button("攻撃"):
