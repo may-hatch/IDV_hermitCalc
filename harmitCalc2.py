@@ -73,7 +73,7 @@ if st.button("切り替え"):
         st.session_state["charge_type"][0]=["none"]
 
 #【画像】枠の表示
-st.image("https://github.com/may-hatch/IDV_hermitCalc/blob/main/assets/frame.png",width=128)
+st.image("assets/frame.png",width=128)
 
 #HP数値の表示
 st.write(st.session_state["hp_show"])
@@ -88,7 +88,7 @@ st.markdown(f"""
             object-fit:cover;
             }}
             </style>
-            <img src="https://github.com/may-hatch/IDV_hermitCalc/blob/main/assets/hp_show.png" class="hp_bar">
+            <img src="assets/hp_show.png" class="hp_bar">
             """,unsafe_allow_html=True)
 st.image("hp_show.png",width=128)
 
