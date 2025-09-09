@@ -34,6 +34,7 @@ streamlit cloud
 #１：HP表示・通常攻撃/治療のみ
 #まず１人分作成
 import streamlit as st
+from PIL import Image
 
 #管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
@@ -72,7 +73,7 @@ if st.button("切り替え"):
         st.session_state["charge_type"]=["none"]
 
 #【画像】枠の表示
-st.image("frame.png",width=128)
+st.image("https://github.com/may-hatch/IDV_hermitCalc/blob/main/assets/frame.png",width=128)
 
 #HP数値の表示
 st.write(st.session_state["hp_show"])
@@ -87,7 +88,7 @@ st.markdown(f"""
             object-fit:cover;
             }}
             </style>
-            <img src="hp_show.png" class="hp_bar">
+            <img src="https://github.com/may-hatch/IDV_hermitCalc/blob/main/assets/hp_show.png" class="hp_bar">
             """,unsafe_allow_html=True)
 st.image("hp_show.png",width=128)
 
