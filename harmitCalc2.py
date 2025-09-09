@@ -60,7 +60,7 @@ st.image(Image.open("assets/frame.png"),width=128)
 st.write(st.session_state["hp_show"][0])
 #【画像】hpゲージの表示
 #プログレスバーを縦向きに変更...はいったん保留
-hp=st.session_state["hp_show"][0]
+hp=float(st.session_state["hp_show"][0])
 st.markdown(f"""
     <style>
     .hp-bar{{
