@@ -46,8 +46,8 @@ if "charge_type" not in st.session_state:
 
 #【画像】電荷の色表示
 charge_type=st.session_state["charge_type"]
-charge_image=f"{charge_type}.png"
-st.image(charge_image,width=128)
+charge_image=f"assets/{charge_type}.png"
+st.image(Image.open(charge_image),width=128)
 
 #電荷切り替えボタン
 #透明化
