@@ -35,11 +35,18 @@ streamlit cloud
 #まず１人分作成
 import streamlit as st
 
-#管理するもの：hp, charge_type(電荷)
+#管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
-    st.session_state.hp=[0]
+    st.session_state["hp"]=[0]
+if "hp_show" not in st.session_state:
+    st.session_state["hp_show"]=[0]
 if "charge_type" not in st.session_state:
-    st.session_state.charge_type=["none"]
+    st.session_state["charge_type"]=["none"]
+
+#【画像】電荷の色表示
+charge_type=st.session_state["charge_type"]
+charge_image=f"{charge_type}.png"
+st.image(charge_image,width=128)
 
 #電荷切り替えボタン
 #透明化
@@ -55,7 +62,7 @@ st.markdown("""
             }
             </style>
             """,unsafe_allow_html=True)
-#機能
+#機能(無→赤→青→無で切り替え)
 if st.button("切り替え"):
     if st.session_state["charge_type"]==["none"]:
         st.session_state["charge_type"]=["red"]
@@ -64,13 +71,36 @@ if st.button("切り替え"):
     else:
         st.session_state["charge_type"]=["none"]
 
+#【画像】枠の表示
+st.image("frame.png",width=128)
+
+#HP数値の表示
+st.write(st.session_state["hp_show"])
+#【画像】hpゲージの表示
+#プログレスバーを縦向きに変更...はいったん保留
+hp=st.session_state["hp_show"]
+st.markdown(f"""
+            <style>
+            .hp-bar{{
+            height:{round(hp*64)}px;
+            width:40px;
+            object-fit:cover;
+            }}
+            </style>
+            <img src="hp_show.png" class="hp_bar">
+            """,unsafe_allow_html=True)
+st.image("hp_show.png",width=128)
+
 #攻撃ボタン(通常攻撃→1250)
 if st.button("攻撃"):
     st.session_state["hp"]+=1250
+    st.session_state["hp_show"]=round(st.session_state["hp"]/1000,2)
 #恐怖の一撃ボタン(1250+1000)
 if st.button("恐怖"):
     st.session_state["hp"]+=2250
+    st.session_state["hp_show"]=round(st.session_state["hp"]/1000,2)
 
 #治療ボタン(汎用性の都合で500ずつ)
 if st.button("治療"):
     st.session_state["hp"]-=500
+    st.session_state["hp_show"]=round(st.session_state["hp"]/1000,2)
