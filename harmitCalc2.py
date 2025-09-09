@@ -75,14 +75,14 @@ st.image(Image.open("assets/hp_show.png"),width=128)
 
 #攻撃ボタン(通常攻撃→1250)
 if st.button("攻撃"):
-    st.session_state["hp"][0]+=1250
+    st.session_state["hp"][0]=st.session_state["hp"][0]+1250
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 #恐怖の一撃ボタン(1250+1000)
 if st.button("恐怖"):
-    st.session_state["hp"][0]+=2250
+    st.session_state["hp"][0]=st.session_state["hp"][0]+2250
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
 #治療ボタン(汎用性の都合で500ずつ)
 if st.button("治療"):
-    st.session_state["hp"][0]-=500
+    st.session_state["hp"][0]=st.session_state["hp"][0]-500
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000,2
