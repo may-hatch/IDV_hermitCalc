@@ -17,6 +17,7 @@ streamlitで使えるようにするため、
 import streamlit as st
 from PIL import Image
 from io import BytesIO
+import requests
 
 #管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
@@ -53,18 +54,17 @@ if st.button("",key="charge_button_1"):
 #【画像】電荷の色
 charge_type=st.session_state["charge_type"][0]
 charge_txt=f"assets/{charge_type}.png"
-charge_url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{charge_type}.png"
-img_charge=Image.open(charge_url).convert("RGBA")
+img_charge=Image.open(charge_txt).convert("RGBA")
 #st.image(charge_txt,width=128)
 
 #【画像】枠
-img_frame=Image.open("https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png").convert("RGBA")
+img_frame=Image.open("assets/frame.png").convert("RGBA")
 #st.image("assets/frame.png",width=128)
 
 #【画像】重ねる
 buffer = BytesIO()
-img_charge.paste(img_frame,(0,0),img_frame)
-img_charge.save(buffer,format="PNG")
+img_marged1=Image.alpha_composite(img_frame,img_charge)
+img_marged1.save(buffer,format="PNG")
 buffer.seek(0)
 st.image(buffer,width=128)
 
