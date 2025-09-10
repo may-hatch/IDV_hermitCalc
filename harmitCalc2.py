@@ -43,7 +43,7 @@ if st.button("治療",key="heal"):
     st.session_state["hp"][0]-=500
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
-st.write(st.session_state["hp_show"][0])
+st.write(st.session_state["hp_show"][0],f"({st.session_state["hp"][0]})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
