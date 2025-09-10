@@ -28,21 +28,8 @@ if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none"]
 
 #電荷切り替えボタン
-#透明化
-st.markdown("""
-    <style>
-    div.stbutton > stbutton{
-            background-color:rgba(0,0,0,0);
-            color:transparent;
-            border:none;
-            height:128px;
-            width:128px;
-            cursor:pointer;
-    }
-    </style>
-""",unsafe_allow_html=True)
 #機能(無→赤→青→無で切り替え)
-if st.button("",key="charge_button_1"):
+if st.button("切り替え",key="charge_button_1"):
     if st.session_state["charge_type"][0]=="none":
         st.session_state["charge_type"][0]="red"
     elif st.session_state["charge_type"][0]=="red":
@@ -58,7 +45,6 @@ img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
 #st.image(charge_txt,width=128)
 
 #【画像】枠
-#img_frame=Image.open("assets/frame.png").convert("RGBA")
 frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
 img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
 #st.image("assets/frame.png",width=128)
@@ -68,24 +54,36 @@ buffer = BytesIO()
 img_marged1=Image.alpha_composite(img_frame,img_charge)
 img_marged1.save(buffer,format="PNG")
 buffer.seek(0)
-st.image(buffer,width=128)
+#st.image(buffer,width=128)
 
 #HP数値の表示
 st.write(st.session_state["hp_show"][0])
 #【画像】hpゲージの表示
 #プログレスバーを縦向きに変更...はいったん保留
-hp=float(st.session_state["hp_show"][0])
-st.markdown(f"""
-    <style>
-    .hp-bar{{
-        height:{round(hp*64)}px;
-        width:40px;
-        object-fit:cover;
-    }}
-    </style>
-    <img src="assets/hp_show.png" class="hp_bar">
-""",unsafe_allow_html=True)
-st.image(Image.open("assets/hp_show.png"),width=128)
+num_hp=st.session_state["hp_show"][0]
+img_hp=Image.open("https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/hp_show.png")
+#HPゲージ用画像の高さを指定
+height_hp=int(round(num_hp*64))
+img_hp.resize((128,height_hp))
+#このあと合成するとき用の高さを記入
+x=0
+y=128-height_hp
+#合成
+img_hp.paste(img_marged1,(x,y),img_marged1)
+img_hp.save(buffer,format="PNG")
+buffer.seek(0)
+st.image(buffer,width=128)
+#st.markdown(f"""
+#    <style>
+#    .hp-bar{{
+#        height:{round(hp*64)}px;
+#        width:40px;
+#        object-fit:cover;
+#    }}
+#    </style>
+#    <img src="assets/hp_show.png" class="hp_bar">
+#""",unsafe_allow_html=True)
+#st.image(Image.open("assets/hp_show.png"),width=128)
 
 #攻撃ボタン(通常攻撃→1250)
 if st.button("攻撃",key="attack"):
