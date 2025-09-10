@@ -53,12 +53,12 @@ if st.button("",key="charge_button_1"):
 #【画像】電荷の色
 charge_type=st.session_state["charge_type"][0]
 charge_txt=f"assets/{charge_type}.png"
-charge_url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/refs/heads/main/assets/{charge_type}.png"
+charge_url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{charge_type}.png"
 img_charge=Image.open(charge_url).convert("RGBA")
 #st.image(charge_txt,width=128)
 
 #【画像】枠
-img_frame=Image.open("https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/refs/heads/main/assets/frame.png").convert("RGBA")
+img_frame=Image.open("https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png").convert("RGBA")
 #st.image("assets/frame.png",width=128)
 
 #【画像】重ねる
