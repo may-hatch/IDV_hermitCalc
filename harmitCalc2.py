@@ -70,7 +70,7 @@ img_hp.resize((128,height_hp))
 x=0
 y=128-height_hp
 #合成
-img_hp.paste(img_marged1,(x,y),img_marged1)
+img_hp.paste(img_marged1,(0,0),img_marged1)
 img_hp.save(buffer,format="PNG")
 buffer.seek(0)
 st.image(buffer,width=128)
