@@ -60,7 +60,7 @@ img_frame=Image.open("assets/frame.png").convert("RGBA")
 
 #【画像】重ねる
 buffer = BytesIO()
-img_frame.paste(img_charge,(64,64),img_charge)
+img_frame.paste(img_charge,(128,128),img_charge)
 img_frame.save(buffer,format="PNG")
 buffer.seek(0)
 st.image(buffer,width=128)
