@@ -25,11 +25,6 @@ if "hp_show" not in st.session_state:
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none"]
 
-#【画像】電荷の色表示
-charge_type=st.session_state["charge_type"][0]
-charge_image=f"assets/{charge_type}.png"
-st.image(Image.open(charge_image),width=128)
-
 #電荷切り替えボタン
 #透明化
 st.markdown("""
@@ -53,8 +48,18 @@ if st.button("",key="charge_button_1"):
     else:
         st.session_state["charge_type"][0]="none"
 
-#【画像】枠の表示
-st.image(Image.open("assets/frame.png"),width=128)
+
+#【画像】電荷の色
+charge_type=st.session_state["charge_type"][0]
+charge_txt=f"assets/{charge_type}.png"
+img_charge=Image.open(charge_txt)
+
+#【画像】枠
+img_frame=Image.open("assets/frame.png").convert("RGBA")
+
+#【画像】重ねる
+img_frame.paste(img_charge,(0,0),img_charge)
+img_frame.show()
 
 #HP数値の表示
 st.write(st.session_state["hp_show"][0])
