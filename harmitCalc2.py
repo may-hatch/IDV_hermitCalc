@@ -27,20 +27,20 @@ if "hp_show" not in st.session_state:
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none"]
 
-#攻撃ボタン(通常攻撃→1250)
+#攻撃ボタン(通常攻撃→1200)
 if st.button("攻撃",key="attack"):
-    st.session_state["hp"][0]+=1200
-#    st.text(f"攻撃ボタンが押された：{st.session_state["hp"][0]}")
-    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-#    st.text(f"表示に反映した：{st.session_state["hp_show"][0]}")
-#恐怖の一撃ボタン(1250+1000)
-if st.button("恐怖",key="terror"):
-    st.session_state["hp"][0]+=2200
+    if st.session_state["hp"][0]>800:
+        st.session_state["hp"][0]=2000
+    else:
+        st.session_state["hp"][0]+=1200
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
 #治療ボタン(汎用性の都合で500ずつ)
 if st.button("治療",key="heal"):
-    st.session_state["hp"][0]-=500
+    if st.session_state["hp"][0]>500:
+        st.session_state["hp"][0]-=500
+    else:
+        st.session_state["hp"][0]=0
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
 st.write(st.session_state["hp_show"][0],f"({st.session_state["hp"][0]})")
@@ -83,7 +83,7 @@ img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 #HPゲージ用画像の高さを指定(エラー対策で1px必ず表示)
 height_hp=int(round(num_hp*64))+1
 img_hp.resize((128,height_hp))
-#このあと合成するとき用の高さを記入
+#このあと合成するとき用の高さを記入(幅は固定なのでx=0)
 x=0
 if height_hp<=128:
     y=128-height_hp
