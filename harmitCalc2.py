@@ -56,8 +56,6 @@ img_marged1.save(buffer,format="PNG")
 buffer.seek(0)
 #st.image(buffer,width=128)
 
-#HP数値の表示
-st.write(st.session_state["hp_show"][0])
 #【画像】hpゲージの表示
 #プログレスバーを縦向きに変更...はいったん保留
 num_hp=st.session_state["hp_show"][0]
@@ -96,3 +94,5 @@ if st.button("恐怖",key="terror"):
 if st.button("治療",key="heal"):
     st.session_state["hp"][0]=st.session_state["hp"][0]-500
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
+
+st.write(st.session_state["hp_show"][0])
