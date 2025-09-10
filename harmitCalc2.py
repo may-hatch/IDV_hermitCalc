@@ -88,7 +88,7 @@ x=0
 if height_hp<=128:
     y=128-height_hp
 else:
-    y=128
+    y=0
 #hpゲージの画像を作成
 img_bg.paste(img_hp,(x,y),img_hp)
 img_bg.save(buffer,format="PNG")
