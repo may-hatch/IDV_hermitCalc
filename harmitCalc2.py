@@ -54,9 +54,11 @@ if st.button("",key="charge_button_1"):
 charge_type=st.session_state["charge_type"][0]
 charge_txt=f"assets/{charge_type}.png"
 img_charge=Image.open(charge_txt)
+st.image(charge_txt,width=128)
 
 #【画像】枠
 img_frame=Image.open("assets/frame.png").convert("RGBA")
+st.image("assets/frame.png",width=128)
 
 #【画像】重ねる
 buffer = BytesIO()
