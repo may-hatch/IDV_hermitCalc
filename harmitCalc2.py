@@ -53,7 +53,7 @@ if st.button("",key="charge_button_1"):
 #【画像】電荷の色
 charge_type=st.session_state["charge_type"][0]
 charge_txt=f"assets/{charge_type}.png"
-img_charge=Image.open(charge_txt)
+#img_charge=Image.open(charge_txt)
 st.image(charge_txt,width=128)
 
 #【画像】枠
@@ -61,11 +61,11 @@ img_frame=Image.open("assets/frame.png").convert("RGBA")
 st.image("assets/frame.png",width=128)
 
 #【画像】重ねる
-buffer = BytesIO()
-img_frame.paste(img_charge,(128,128),img_charge)
-img_frame.save(buffer,format="PNG")
-buffer.seek(0)
-st.image(buffer,width=128)
+#buffer = BytesIO()
+#img_frame.paste(img_charge,(128,128),img_charge)
+#img_frame.save(buffer,format="PNG")
+#buffer.seek(0)
+#st.image(buffer,width=128)
 
 #HP数値の表示
 st.write(st.session_state["hp_show"][0])
