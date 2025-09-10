@@ -64,7 +64,7 @@ num_hp=st.session_state["hp_show"][0]
 img_hp_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/hp_show.png"
 img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
 #HPゲージ用画像の高さを指定
-height_hp=int(round(num_hp*64))
+height_hp=int(round(num_hp*64))+1
 img_hp.resize((128,height_hp))
 #このあと合成するとき用の高さを記入
 x=0
