@@ -34,7 +34,7 @@ if st.button("攻撃",key="attack"):
     else:
         st.session_state["hp"][0]+=1200
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-    st.session_state["charge_type"][0]=["none"]
+    st.session_state["charge_type"][0]="none"
 
 #治療ボタン(汎用性の都合で500ずつ)
 if st.button("治療",key="heal"):
