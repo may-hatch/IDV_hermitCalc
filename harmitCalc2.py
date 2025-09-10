@@ -16,6 +16,7 @@ streamlitで使えるようにするため、
 #まず１人分作成
 import streamlit as st
 from PIL import Image
+from io import BytesIO
 
 #管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
@@ -58,8 +59,11 @@ img_charge=Image.open(charge_txt)
 img_frame=Image.open("assets/frame.png").convert("RGBA")
 
 #【画像】重ねる
-img_frame.paste(img_charge,(0,0),img_charge)
-img_frame.show()
+buffer = BytesIO()
+img_frame.paste(img_charge,(64,64),img_charge)
+img_frame.save(buffer,format="PNG")
+buffer.seek(0)
+st.image(buffer,width=128)
 
 #HP数値の表示
 st.write(st.session_state["hp_show"][0])
