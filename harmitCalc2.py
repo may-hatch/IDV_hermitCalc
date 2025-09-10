@@ -63,8 +63,8 @@ img_frame=Image.open("https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc
 
 #【画像】重ねる
 buffer = BytesIO()
-img_frame.paste(img_charge,(0,0),img_charge)
-img_frame.save(buffer,format="PNG")
+img_charge.paste(img_frame,(0,0),img_frame)
+img_charge.save(buffer,format="PNG")
 buffer.seek(0)
 st.image(buffer,width=128)
 
