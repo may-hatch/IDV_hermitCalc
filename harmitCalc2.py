@@ -80,22 +80,13 @@ img_bg.paste(img_marged1,(0,0),img_marged1)
 img_bg.save(buffer,format="PNG")
 buffer.seek(0)
 st.image(buffer,width=128)
-#st.markdown(f"""
-#    <style>
-#    .hp-bar{{
-#        height:{round(hp*64)}px;
-#        width:40px;
-#        object-fit:cover;
-#    }}
-#    </style>
-#    <img src="assets/hp_show.png" class="hp_bar">
-#""",unsafe_allow_html=True)
-#st.image(Image.open("assets/hp_show.png"),width=128)
 
 #攻撃ボタン(通常攻撃→1250)
 if st.button("攻撃",key="attack"):
-    st.session_state["hp"][0]=st.session_state["hp"][0]+1250
+    st.session_state["hp"][0]+=1250
+    st.text(f"攻撃ボタンが押された：{st.session_state["hp"][0]}")
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
+    st.text(f"表示に反映した：{st.session_state["hp_show"][0]}")
 #恐怖の一撃ボタン(1250+1000)
 if st.button("恐怖",key="terror"):
     st.session_state["hp"][0]=st.session_state["hp"][0]+2250
