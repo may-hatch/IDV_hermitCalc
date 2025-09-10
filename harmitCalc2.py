@@ -85,7 +85,10 @@ height_hp=int(round(num_hp*64))+1
 img_hp.resize((128,height_hp))
 #このあと合成するとき用の高さを記入
 x=0
-y=128-height_hp
+if height_hp<=128:
+    y=128-height_hp
+else:
+    y=128
 #hpゲージの画像を作成
 img_bg.paste(img_hp,(x,y),img_hp)
 img_bg.save(buffer,format="PNG")
