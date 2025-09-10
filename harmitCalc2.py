@@ -27,6 +27,24 @@ if "hp_show" not in st.session_state:
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none"]
 
+#攻撃ボタン(通常攻撃→1250)
+if st.button("攻撃",key="attack"):
+    st.session_state["hp"][0]+=1250
+#    st.text(f"攻撃ボタンが押された：{st.session_state["hp"][0]}")
+    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
+#    st.text(f"表示に反映した：{st.session_state["hp_show"][0]}")
+#恐怖の一撃ボタン(1250+1000)
+if st.button("恐怖",key="terror"):
+    st.session_state["hp"][0]+=2250
+    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
+
+#治療ボタン(汎用性の都合で500ずつ)
+if st.button("治療",key="heal"):
+    st.session_state["hp"][0]-=500
+    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
+
+st.write(st.session_state["hp_show"][0])
+
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
 if st.button("切り替え",key="charge_button_1"):
@@ -36,7 +54,6 @@ if st.button("切り替え",key="charge_button_1"):
         st.session_state["charge_type"][0]="blue"
     else:
         st.session_state["charge_type"][0]="none"
-
 
 #【画像】電荷の色
 charge_type=st.session_state["charge_type"][0]
@@ -79,20 +96,3 @@ img_bg.save(buffer,format="PNG")
 buffer.seek(0)
 st.image(buffer,width=128)
 
-#攻撃ボタン(通常攻撃→1250)
-if st.button("攻撃",key="attack"):
-    st.session_state["hp"][0]+=1250
-#    st.text(f"攻撃ボタンが押された：{st.session_state["hp"][0]}")
-    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-#    st.text(f"表示に反映した：{st.session_state["hp_show"][0]}")
-#恐怖の一撃ボタン(1250+1000)
-if st.button("恐怖",key="terror"):
-    st.session_state["hp"][0]+=2250
-    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-
-#治療ボタン(汎用性の都合で500ずつ)
-if st.button("治療",key="heal"):
-    st.session_state["hp"][0]-=500
-    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-
-st.write(st.session_state["hp_show"][0])
