@@ -50,7 +50,7 @@ for i in range(4):
         st.session_state["hp_show"][{i}]=st.session_state["hp"][{i}]/1000
 
 #HPを数値で表示
-    st.write(f"# {st.session_state["hp_show"][{i}]}",f"({st.session_state["hp"][{i}]})")
+    st.write(f"{st.session_state["hp_show"][{i}]}",f"({st.session_state["hp"][{i}]})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
@@ -126,4 +126,5 @@ for i in range(4):
     img_bg.save(buffer,format="PNG")
     buffer.seek(0)
     st.image(buffer,width=128)
+
 
