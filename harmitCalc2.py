@@ -32,39 +32,37 @@ if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none","none","none","none"]
 
 #攻撃ボタン(通常攻撃→1200)
-for i in range(0,4):
-    if st.button("攻撃",key=f"attack_{i+1}"):
-        if st.session_state["hp"][{i}]>800:
-            st.session_state["hp"][{i}]=2000
-        else:
-            st.session_state["hp"][{i}]+=1200
-        st.session_state["hp_show"][{i}]=st.session_state["hp"][{i}]/1000
-        st.session_state["charge_type"][{i}]="none"
+if st.button("攻撃",key=f"attack_1"):
+    if st.session_state["hp"][0]>800:
+        st.session_state["hp"][0]=2000
+    else:
+        st.session_state["hp"][0]+=1200
+    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
+    st.session_state["charge_type"][0]="none"
 
 #治療ボタン(汎用性の都合で500ずつ)
-    if st.button("治療",key=f"heal_{i+1}"):
-        if st.session_state["hp"][{i}]>500:
-            st.session_state["hp"][{i}]-=500
-        else:
-            st.session_state["hp"][{i}]=0
-        st.session_state["hp_show"][{i}]=st.session_state["hp"][{i}]/1000
+if st.button("治療",key=f"heal_1"):
+    if st.session_state["hp"][0]>500:
+        st.session_state["hp"][0]-=500
+    else:
+        st.session_state["hp"][0]=0
+    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
 #HPを数値で表示
-st.write(f"# {st.session_state["hp_show"][0]}",f"({st.session_state["hp"][0]})")
-st.write(f"# {st.session_state["hp_show"][1]}",f"({st.session_state["hp"][1]})")
-st.write(f"# {st.session_state["hp_show"][2]}",f"({st.session_state["hp"][2]})")
-st.write(f"# {st.session_state["hp_show"][3]}",f"({st.session_state["hp"][3]})")
+st.write(f"# {st.session_state["hp_show"][0]}",f"## ({st.session_state["hp"][0]})")
+st.write(f"# {st.session_state["hp_show"][1]}",f"## ({st.session_state["hp"][1]})")
+st.write(f"# {st.session_state["hp_show"][2]}",f"## ({st.session_state["hp"][2]})")
+st.write(f"# {st.session_state["hp_show"][3]}",f"## ({st.session_state["hp"][3]})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-for i in range(0,4):
-    if st.button("切り替え",key=f"charge_button_{i+1}"):
-        if st.session_state["charge_type"][{i}]=="none":
-            st.session_state["charge_type"][{i}]="red"
-        elif st.session_state["charge_type"][{i}]=="red":
-            st.session_state["charge_type"][{i}]="blue"
-        else:
-            st.session_state["charge_type"][{i}]="none"
+if st.button("切り替え",key=f"charge_button_1"):
+    if st.session_state["charge_type"][0]=="none":
+        st.session_state["charge_type"][0]="red"
+    elif st.session_state["charge_type"][0]=="red":
+        st.session_state["charge_type"][0]="blue"
+    else:
+        st.session_state["charge_type"][0]="none"
 
 #【画像】電荷の色
 #種類の取得
@@ -109,24 +107,24 @@ bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/n
 img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 
 #画像高さ計算用にhp数値取得
-for i in range(0,4): 
-    num_hp=st.session_state["hp_show"][{i}]
+#num_hp=0
+num_hp=st.session_state["hp_show"][0]
 #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
-    height_hp=int(round(num_hp*64))+1
-    img_hp.resize((128,height_hp))
+height_hp=int(round(num_hp*64))+1
+img_hp.resize((128,height_hp))
 #このあと合成するとき用の高さを記入(幅は固定なのでx=0)
 #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
-    x=0
-    if height_hp<=128:
-        y=128-height_hp
-    else:
-        y=0
+x=0
+if height_hp<=128:
+    y=128-height_hp
+else:
+    y=0
 #hpゲージの画像を作成
-    img_bg.paste(img_hp,(x,y),img_hp)
-    img_bg.save(buffer,format="PNG")
+img_bg.paste(img_hp,(x,y),img_hp)
+img_bg.save(buffer,format="PNG")
 #上で作った画像と合成
-    img_bg.paste(img_marged1,(0,0),img_marged1)
-    img_bg.save(buffer,format="PNG")
-    buffer.seek(0)
-    st.image(buffer,width=128)
+img_bg.paste(img_marged1,(0,0),img_marged1)
+img_bg.save(buffer,format="PNG")
+buffer.seek(0)
+st.image(buffer,width=128)
 
