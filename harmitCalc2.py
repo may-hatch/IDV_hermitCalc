@@ -23,13 +23,16 @@ from PIL import Image
 from io import BytesIO
 import requests
 
-#管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
+#session_stateで管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
     st.session_state["hp"]=[0,0,0,0]
 if "hp_show" not in st.session_state:
     st.session_state["hp_show"]=[0,0,0,0]
+if "hp_height" not in st.session_state:
+    st.session_state["hp_height"]=[0,0,0,0]
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none","none","none","none"]
+
 
 #攻撃ボタン(通常攻撃→1200)
 if st.button("攻撃",key=f"attack_1"):
@@ -49,10 +52,10 @@ if st.button("治療",key=f"heal_1"):
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
 #HPを数値で表示
-st.write(f"# {st.session_state["hp_show"][0]}",f"## ({st.session_state["hp"][0]})")
-st.write(f"# {st.session_state["hp_show"][1]}",f"## ({st.session_state["hp"][1]})")
-st.write(f"# {st.session_state["hp_show"][2]}",f"## ({st.session_state["hp"][2]})")
-st.write(f"# {st.session_state["hp_show"][3]}",f"## ({st.session_state["hp"][3]})")
+for l in range(0,4):
+    prt_1=f"""st.session_state["hp_show"][{l}]"""
+    prt_2=f"""st.session_state["hp"][{l}]"""
+    st.write(f"{prt_1}",f"({prt_2})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
@@ -107,24 +110,27 @@ bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/n
 img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 
 #画像高さ計算用にhp数値取得
-#num_hp=0
-num_hp=st.session_state["hp_show"][0]
 #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
-height_hp=int(round(num_hp*64))+1
-img_hp.resize((128,height_hp))
+for k in range(0,4):
+    num_hp=st.session_state["hp_show"][k]
+    height_hp=int(round(num_hp*64))+1
+    img_hp.resize((128,height_hp_1))
+
+
+for j in range(0,4):
 #このあと合成するとき用の高さを記入(幅は固定なのでx=0)
 #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
-x=0
-if height_hp<=128:
-    y=128-height_hp
-else:
-    y=0
+    x=0
+    if height_hp_{i}<=128:
+        y=128-height_hp_{i}
+    else:
+        y=0
 #hpゲージの画像を作成
-img_bg.paste(img_hp,(x,y),img_hp)
-img_bg.save(buffer,format="PNG")
+    img_bg.paste(img_hp,(x,y),img_hp)
+    img_bg.save(buffer,format="PNG")
 #上で作った画像と合成
-img_bg.paste(img_marged1,(0,0),img_marged1)
-img_bg.save(buffer,format="PNG")
-buffer.seek(0)
-st.image(buffer,width=128)
+    img_bg.paste(img_marged1,(0,0),img_marged1)
+    img_bg.save(buffer,format="PNG")
+    buffer.seek(0)
+    st.image(buffer,width=128)
 
