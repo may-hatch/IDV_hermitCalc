@@ -33,6 +33,7 @@ if "hp_height" not in st.session_state:
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none","none","none","none"]
 
+charge_type=st.session_state["charge_type"]
 
 #攻撃ボタン(通常攻撃→1200)
 if st.button("攻撃",key=f"attack_1"):
@@ -59,18 +60,17 @@ for hs in hp_nums:
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-for l in range(0,4):
-    if st.button("切り替え",key=f"charge_button_{l}"):
-        if st.session_state["charge_type"][{l}]=="none":
-            st.session_state["charge_type"][{l}]="red"
-        elif st.session_state["charge_type"][{l}]=="red":
-            st.session_state["charge_type"][{l}]="blue"
+for ct,num in charge_type,range(0,4):
+    if st.button("切り替え",key=f"charge_button{num}"):
+        if ct=="none":
+            ct="red"
+        elif ct=="red":
+            ct="blue"
         else:
-            st.session_state["charge_type"][{l}]="none"
+            ct="none"
 
 #【画像】電荷の色
 #種類の取得
-    charge_type=st.session_state["charge_type"]
     charge_imgs=[]
 #参照URLの決定、画像の取得・集約
 for ct in charge_type:
