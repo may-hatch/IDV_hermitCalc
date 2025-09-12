@@ -114,15 +114,12 @@ img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 for k in range(0,4):
     num_hp=st.session_state["hp_show"][k]
     height_hp=int(round(num_hp*64))+1
-    img_hp.resize((128,height_hp_1))
-
-
-for j in range(0,4):
+    img_hp.resize((128,height_hp))
 #このあと合成するとき用の高さを記入(幅は固定なのでx=0)
 #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
     x=0
-    if height_hp_{i}<=128:
-        y=128-height_hp_{i}
+    if height_hp<=128:
+        y=128-height_hp
     else:
         y=0
 #hpゲージの画像を作成
