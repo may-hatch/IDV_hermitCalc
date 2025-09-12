@@ -59,6 +59,7 @@ for hs in hp_nums:
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
+for l in range(0,4):
     if st.button("切り替え",key=f"charge_button_{l}"):
         if st.session_state["charge_type"][{l}]=="none":
             st.session_state["charge_type"][{l}]="red"
