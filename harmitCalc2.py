@@ -52,10 +52,10 @@ if st.button("治療",key=f"heal_1"):
     st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
 
 #HPを数値で表示
-for l in range(0,4):
-    prt_1=st.session_state["hp_show"][{l}]
-    prt_2=st.session_state["hp"][{l}]
-    st.write(f"{prt_1}",f"({prt_2})")
+hp_nums=st.session_state["hp"]
+for hs in hp_nums:
+    st.text(f"{hs}")
+    st.text(f"({round(hs/1000)})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
