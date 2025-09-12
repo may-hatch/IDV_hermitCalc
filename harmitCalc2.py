@@ -33,7 +33,7 @@ if "hp_height" not in st.session_state:
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none","none","none","none"]
 
-charge_type=st.session_state["charge_type"]
+charge_types=st.session_state["charge_type"]
 
 #攻撃ボタン(通常攻撃→1200)
 if st.button("攻撃",key=f"attack_1"):
@@ -60,8 +60,8 @@ for hs in hp_nums:
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-for ct,num in charge_type,range(0,4):
-    if st.button("切り替え",key=f"charge_button{num}"):
+for ct in charge_types:
+    if st.button("切り替え",key=f"charge_button_{charge_types.index(ct)}"):
         if ct=="none":
             ct="red"
         elif ct=="red":
@@ -73,7 +73,7 @@ for ct,num in charge_type,range(0,4):
 #種類の取得
     charge_imgs=[]
 #参照URLの決定、画像の取得・集約
-for ct in charge_type:
+for ct in charge_types:
     charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
     img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
     charge_imgs.append(img_charge)
