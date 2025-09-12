@@ -53,36 +53,29 @@ if st.button("治療",key=f"heal_1"):
 
 #HPを数値で表示
 for l in range(0,4):
-    prt_1=f"""st.session_state["hp_show"][{l}]"""
-    prt_2=f"""st.session_state["hp"][{l}]"""
+    prt_1=st.session_state["hp_show"][{l}]
+    prt_2=st.session_state["hp"][{l}]
     st.write(f"{prt_1}",f"({prt_2})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-if st.button("切り替え",key=f"charge_button_1"):
-    if st.session_state["charge_type"][0]=="none":
-        st.session_state["charge_type"][0]="red"
-    elif st.session_state["charge_type"][0]=="red":
-        st.session_state["charge_type"][0]="blue"
-    else:
-        st.session_state["charge_type"][0]="none"
+    if st.button("切り替え",key=f"charge_button_{l}"):
+        if st.session_state["charge_type"][{l}]=="none":
+            st.session_state["charge_type"][{l}]="red"
+        elif st.session_state["charge_type"][{l}]=="red":
+            st.session_state["charge_type"][{l}]="blue"
+        else:
+            st.session_state["charge_type"][{l}]="none"
 
 #【画像】電荷の色
 #種類の取得
-charge_type_1=st.session_state["charge_type"][0]
-charge_type_2=st.session_state["charge_type"][1]
-charge_type_3=st.session_state["charge_type"][2]
-charge_type_4=st.session_state["charge_type"][3]
-#参照URLの決定
-charge_url_1 = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{charge_type_1}.png"
-charge_url_2 = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{charge_type_2}.png"
-charge_url_3 = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{charge_type_3}.png"
-charge_url_4 = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{charge_type_4}.png"
-#画像の取得
-img_charge_1=Image.open(BytesIO(requests.get(charge_url_1).content)).convert("RGBA")
-img_charge_2=Image.open(BytesIO(requests.get(charge_url_2).content)).convert("RGBA")
-img_charge_3=Image.open(BytesIO(requests.get(charge_url_3).content)).convert("RGBA")
-img_charge_4=Image.open(BytesIO(requests.get(charge_url_4).content)).convert("RGBA")
+    charge_type=st.session_state["charge_type"]
+    charge_imgs=[]
+#参照URLの決定、画像の取得・集約
+for ct in charge_type:
+    charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
+    img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
+    charge_imgs.append(img_charge)
     
 #【画像】枠
 frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
@@ -90,16 +83,12 @@ img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
 
 #【画像】重ねる
 buffer = BytesIO()
+overlay_imgs=[]
 #電荷、枠画像の合成
-img_marged1=Image.alpha_composite(img_frame,img_charge_1)
-img_marged2=Image.alpha_composite(img_frame,img_charge_2)
-img_marged3=Image.alpha_composite(img_frame,img_charge_3)
-img_marged4=Image.alpha_composite(img_frame,img_charge_4)
+for ci in charge_imgs:
+    img_marged=Image.alpha_composite(img_frame,ct)
 #合成画像のバッファへの保存
-img_marged1.save(buffer,format="PNG")
-img_marged2.save(buffer,format="PNG")
-img_marged3.save(buffer,format="PNG")
-img_marged4.save(buffer,format="PNG")
+    overlay_imgs.append(img_marged)
 
 #【画像】hpゲージの表示
 #hp用元画像の取得
@@ -109,10 +98,12 @@ img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
 bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/none.png"
 img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 
+
+list_height=[]
 #画像高さ計算用にhp数値取得
 #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
-for k in range(0,4):
-    num_hp=st.session_state["hp_show"][k]
+for i in range(0,4):
+    num_hp=st.session_state["hp_show"][i]
     height_hp=int(round(num_hp*64))+1
     img_hp.resize((128,height_hp))
 #このあと合成するとき用の高さを記入(幅は固定なのでx=0)
@@ -122,11 +113,15 @@ for k in range(0,4):
         y=128-height_hp
     else:
         y=0
+    list_height.append(y)
+
 #hpゲージの画像を作成
     img_bg.paste(img_hp,(x,y),img_hp)
     img_bg.save(buffer,format="PNG")
+    
+for oi in overlay_imgs:
 #上で作った画像と合成
-    img_bg.paste(img_marged1,(0,0),img_marged1)
+    img_bg.paste(oi,(0,0),oi)
     img_bg.save(buffer,format="PNG")
     buffer.seek(0)
     st.image(buffer,width=128)
