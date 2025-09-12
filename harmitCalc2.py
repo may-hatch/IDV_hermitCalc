@@ -33,7 +33,7 @@ if "hp_height" not in st.session_state:
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none","none","none","none"]
 
-charge_types=st.session_state["charge_type"]
+charge_types=list(st.session_state["charge_type"])
 
 #攻撃ボタン(通常攻撃→1200)
 if st.button("攻撃",key=f"attack_1"):
