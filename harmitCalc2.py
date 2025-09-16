@@ -7,12 +7,13 @@ streamlitで使えるようにするため、
 
 #隠者戦HP計算機
 #機能ごとに段階的に作成
-#【１：HP表示・通常攻撃/治療のみ】←イマココ
+#【１：HP表示・通常攻撃/治療のみ】
 #   一人分で表示まで完成
-#   複数人の計算
+#   複数人の計算←今ここ
 #   複数人の表示
 #【２：予測表示】
-#   赤の人
+#   例：「赤：0.4,青：1.2」
+#___ここで実用実験___
 #【３：キャラごとのスキル反映】
 #【４：別タブにて地図の表示】
 
@@ -23,6 +24,12 @@ from PIL import Image
 from io import BytesIO
 import requests
 
+#説明
+with st.expander("使い方"):
+    st.write("""【試験中】
+             第五人格の隠者戦においてHPを数値で確認するためのツール。
+             """)
+
 #session_stateで管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
     st.session_state["hp"]=[0,0,0,0]
@@ -32,17 +39,42 @@ if "hp_height" not in st.session_state:
     st.session_state["hp_height"]=[0,0,0,0]
 if "charge_type" not in st.session_state:
     st.session_state["charge_type"]=["none","none","none","none"]
+#無、赤、青で人数カウント
+if "charge_count" not in st.session_state:
+    st.session_state["charge_count"]=[4,0,0]
 
 charge_types=list(st.session_state["charge_type"])
 
 #攻撃ボタン(通常攻撃→1200)
-if st.button("攻撃",key=f"attack_1"):
-    if st.session_state["hp"][0]>800:
-        st.session_state["hp"][0]=2000
+if st.button("攻撃",key="attack_1"):
+    if st.session_state["charge_type"][0]=="red":
+        dmg=1200/(st.session_state["charge_count"][1])
+    elif st.session_state["chaege_type"][0]=="blue":
+        dmg=1200/(st.session_state["charge_count"][2])
     else:
-        st.session_state["hp"][0]+=1200
-    st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-    st.session_state["charge_type"][0]="none"
+        dmg=1200
+    for (type,chara_hp) in zip(st.session_state["chage_type"],st.session_state["hp"]):
+        if st.session_state["chaege_type"][0]=="none":
+            if chara_hp>2000-dmg:
+                chara_hp=2000
+            else:
+                chara_hp+=dmg
+            break
+        if type==st.session_state["charge_type"][0]:
+            if chara_hp>2000-dmg:
+                chara_hp=2000
+            else:
+                chara_hp+=dmg
+            type="none"
+    st.session_state["hp_show"]=st.session_state["hp"]/1000
+    st.session_state["charge_count"]=[0,0,0]
+    for type in st.session_state["charge_type"]:
+        if type=="none":
+            st.session_state["charge_count"][0]+=1
+        elif type=="red":
+            st.session_state["charge_count"][1]+=1
+        else:
+            st.session_state["charge_count"][2]+=1
 
 #治療ボタン(汎用性の都合で500ずつ)
 if st.button("治療",key=f"heal_1"):
@@ -58,19 +90,21 @@ for hs in hp_nums:
     st.text(f"{hs}")
     st.text(f"({round(hs/1000)})")
 
-
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-num=1
-for ct in charge_types:
-    if st.button("切り替え",key=f"charge_button_{num}"):
-        if ct=="none":
-            ct="red"
-        elif ct=="red":
-            ct="blue"
-        else:
-            ct="none"
-        num+=1
+if st.button("切り替え",key=f"charge_button_1"):
+    if st.session_state["charge_type"][0]=="none":
+        st.session_state["charge_type"][0]="red"
+        st.session_state["charge_count"][0]-=1
+        st.session_state["charge_count"][1]+=1
+    elif st.session_state["charge_type"][0]=="red":
+        st.session_state["charge_type"][0]="blue"
+        st.session_state["charge_count"][1]-=1
+        st.session_state["charge_count"][2]+=1
+    else:
+        st.session_state["charge_type"][0]="none"
+        st.session_state["charge_count"][2]-=1
+        st.session_state["charge_count"][0]+=1
 
 #【画像】電荷の色
 #種類の取得
@@ -104,7 +138,7 @@ img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 
 
 list_height=[]
-#画像高さ計算用にhp数値取得
+#高さ計算用にhp数値取得
 #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
 for i in range(0,4):
     num_hp=st.session_state["hp_show"][i]
