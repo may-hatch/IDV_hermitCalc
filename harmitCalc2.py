@@ -61,7 +61,8 @@ for hs in hp_nums:
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-for ct,num in charge_types,range(1,5):
+num=0
+for ct in charge_types:
     if st.button("切り替え",key=f"charge_button_{num}"):
         if ct=="none":
             ct="red"
@@ -69,6 +70,7 @@ for ct,num in charge_types,range(1,5):
             ct="blue"
         else:
             ct="none"
+        num+=1
 
 #【画像】電荷の色
 #種類の取得
