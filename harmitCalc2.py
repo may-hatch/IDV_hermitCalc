@@ -58,10 +58,11 @@ for hs in hp_nums:
     st.text(f"{hs}")
     st.text(f"({round(hs/1000)})")
 
+
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
-for ct in charge_types:
-    if st.button("切り替え",key=f"charge_button_{charge_types.index(ct)}"):
+for ct,num in charge_types,range(1,5):
+    if st.button("切り替え",key=f"charge_button_{num}"):
         if ct=="none":
             ct="red"
         elif ct=="red":
