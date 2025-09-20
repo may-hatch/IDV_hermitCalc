@@ -108,12 +108,12 @@ if st.button("切り替え",key=f"charge_button_1"):
 
 #【画像】電荷の色
 #種類の取得
-charge_imgs=[]*4
+charge_imgs=[None,None,None,None]
 #参照URLの決定、画像の取得・集約
-for ct in charge_types:
+for (ct,ci) in zip(charge_types,charge_imgs):
     charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
     img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
-    charge_imgs[charge_types.index(ct)]=img_charge
+    ci=img_charge
     
 #【画像】枠
 frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
@@ -121,12 +121,12 @@ img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
 
 #【画像】重ねる
 buffer = BytesIO()
-overlay_imgs=[]*4
+overlay_imgs=[None,None,None,None]
 #電荷、枠画像の合成
-for ci in charge_imgs:
-    img_marged=Image.alpha_composite(img_frame,ci)
+for cha,over in zip(charge_imgs,overlay_imgs):
+    img_marged=Image.alpha_composite(img_frame,cha)
 #合成した上レイヤーのバッファへの保存(表示はまだ)
-    overlay_imgs[charge_imgs.index(ci)]=img_marged
+    over=img_marged
 
 #【画像】hpゲージの表示
 #hp用元画像の取得
@@ -155,9 +155,9 @@ for i in range(0,4):
     img_bg.paste(img_hp,(x,y),img_hp)
     img_bg.save(buffer,format="PNG")
     
-for oi in overlay_imgs:
+for final_img in overlay_imgs:
 #上で作った画像と合成
-    img_bg.paste(oi,(0,0),oi)
+    img_bg.paste(final_img,(0,0),final_img)
     img_bg.save(buffer,format="PNG")
     buffer.seek(0)
     st.image(buffer,width=128)
