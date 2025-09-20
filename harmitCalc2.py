@@ -66,7 +66,7 @@ if st.button("攻撃",key="attack_1"):
             else:
                 chara_hp+=dmg
             type="none"
-    st.session_state["hp_show"]=st.session_state["hp"]/1000
+        st.session_state["hp_show"]=chara_hp/1000
     st.session_state["charge_count"]=[0,0,0]
     for type in st.session_state["charge_type"]:
         if type=="none":
