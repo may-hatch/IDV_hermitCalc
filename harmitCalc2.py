@@ -108,7 +108,7 @@ if st.button("切り替え",key=f"charge_button_1"):
 
 #【画像】電荷の色
 #種類の取得
-charge_imgs=[None,None,None,None]
+charge_imgs=[]*4
 #参照URLの決定、画像の取得・集約
 for (ct,ci) in zip(charge_types,charge_imgs):
     charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
@@ -121,7 +121,7 @@ img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
 
 #【画像】重ねる
 buffer = BytesIO()
-overlay_imgs=[None,None,None,None]
+overlay_imgs=[]*4
 #電荷、枠画像の合成
 for cha,over in zip(charge_imgs,overlay_imgs):
     img_marged=Image.alpha_composite(img_frame,cha)
@@ -161,4 +161,3 @@ for final_img in overlay_imgs:
     img_bg.save(buffer,format="PNG")
     buffer.seek(0)
     st.image(buffer,width=128)
-
