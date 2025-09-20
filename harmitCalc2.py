@@ -88,7 +88,7 @@ if st.button("治療",key=f"heal_1"):
 hp_nums=st.session_state["hp"]
 for hs in hp_nums:
     st.text(f"{hs}")
-    st.text(f"({round(hs/1000)})")
+    #st.text(f"({round(hs/1000)})")
 
 #電荷切り替えボタン
 #機能(無→赤→青→無で切り替え)
@@ -108,7 +108,7 @@ if st.button("切り替え",key=f"charge_button_1"):
 
 #【画像】電荷の色
 #種類の取得
-    charge_imgs=[]
+charge_imgs=[]
 #参照URLの決定、画像の取得・集約
 for ct in charge_types:
     charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
