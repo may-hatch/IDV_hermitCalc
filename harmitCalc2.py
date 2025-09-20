@@ -53,7 +53,7 @@ if st.button("攻撃",key="attack_1"):
         dmg=1200/(st.session_state["charge_count"][2])
     else:
         dmg=1200
-    for (type,chara_hp) in zip(st.session_state["charge_type"],st.session_state["hp"]):
+    for (type,chara_hp,chara_hp_show) in zip(st.session_state["charge_type"],st.session_state["hp"],st.session_state["hp_show"]):
         if st.session_state["charge_type"][0]=="none":
             if chara_hp>2000-dmg:
                 chara_hp=2000
@@ -66,7 +66,7 @@ if st.button("攻撃",key="attack_1"):
             else:
                 chara_hp+=dmg
             type="none"
-        st.session_state["hp_show"]=chara_hp/1000
+        chara_hp_show=chara_hp/1000
     st.session_state["charge_count"]=[0,0,0]
     for type in st.session_state["charge_type"]:
         if type=="none":
