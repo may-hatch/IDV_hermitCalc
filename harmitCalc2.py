@@ -108,12 +108,12 @@ if st.button("切り替え",key=f"charge_button_1"):
 
 #【画像】電荷の色
 #種類の取得
-charge_imgs=[]
+charge_imgs=[]*4
 #参照URLの決定、画像の取得・集約
 for ct in charge_types:
     charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
     img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
-    charge_imgs.append(img_charge)
+    charge_imgs[charge_types.index(ct)]=img_charge
     
 #【画像】枠
 frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
@@ -121,12 +121,12 @@ img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
 
 #【画像】重ねる
 buffer = BytesIO()
-overlay_imgs=[]
+overlay_imgs=[]*4
 #電荷、枠画像の合成
 for ci in charge_imgs:
-    img_marged=Image.alpha_composite(ci,img_frame)
-#合成画像のバッファへの保存
-    overlay_imgs.append(img_marged)
+    img_marged=Image.alpha_composite(img_frame,ci)
+#合成した上レイヤーのバッファへの保存(表示はまだ)
+    overlay_imgs[charge_imgs.index(ci)]=img_marged
 
 #【画像】hpゲージの表示
 #hp用元画像の取得
@@ -136,7 +136,6 @@ img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
 bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/none.png"
 img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
 
-
 list_height=[]
 #高さ計算用にhp数値取得
 #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
@@ -144,7 +143,7 @@ for i in range(0,4):
     num_hp=st.session_state["hp_show"][i]
     height_hp=int(round(num_hp*64))+1
     img_hp.resize((128,height_hp))
-#このあと合成するとき用の高さを記入(幅は固定なのでx=0)
+#このあと合成するとき用の高さ(幅は固定なのでx=0)
 #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
     x=0
     if height_hp<=128:
@@ -152,8 +151,7 @@ for i in range(0,4):
     else:
         y=0
     list_height.append(y)
-
-#hpゲージの画像を作成
+#hpゲージの画像を128x128で作成
     img_bg.paste(img_hp,(x,y),img_hp)
     img_bg.save(buffer,format="PNG")
     
