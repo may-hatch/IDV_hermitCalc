@@ -124,7 +124,7 @@ buffer = BytesIO()
 overlay_imgs=[]
 #電荷、枠画像の合成
 for ci in charge_imgs:
-    img_marged=Image.alpha_composite(img_frame,ci)
+    img_marged=Image.alpha_composite(ci,img_frame)
 #合成画像のバッファへの保存
     overlay_imgs.append(img_marged)
 
