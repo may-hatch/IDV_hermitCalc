@@ -25,11 +25,11 @@ streamlitで使えるようにするため、
 #【３：キャラごとのスキル反映】
 #【４：別タブにて地図の表示】
 
-#１：HP表示・通常攻撃/治療のみ
+
 import streamlit as st
-#from PIL import Image
-#from io import BytesIO
-#import requests
+from PIL import Image
+from io import BytesIO
+import requests
 
 st.title("隠者戦HP計算機")
 #説明
@@ -124,11 +124,53 @@ for s  in range(4):
                     st.session_state["charge_count"][2]-=1
                     st.session_state["charge_count"][0]+=1
         with st.container():
-        #HPと電荷を表示
+        #HPと電荷を表示（文字）
             st.text(f"ダメージ：{st.session_state["hp"][s]}")
             st.text(f"({st.session_state["hp_show"][s]})")
             st.text(f"極性：{st.session_state["charge_type"][s]}")
-#！！！画像！！！
+
+        #HPと電荷を表示(画像)
+        #【画像】極性
+        charge_url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{st.session_state["charge_type"][s]}.png"
+        img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
+        #【画像】枠
+        frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
+        img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
+        #【画像】重ねる
+        buffer = BytesIO()
+        #電荷、枠画像の合成
+        overlay_img=Image.alpha_composite(img_frame,img_charge)
+        #上レイヤーを保存
+        #overlay_img.save(buffer,format="PNG")
+
+        #【画像】hpゲージの表示
+        #hp用元画像の取得
+        img_hp_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/hp_show.png"
+        img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
+        #画像サイズを合わせるために透明背景画像を利用
+        bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/none.png"
+        img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
+        #高さ計算用にhp数値取得
+        #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
+        height_hp=int(round(st.session_state["hp_show"][s]*64))+1
+        img_hp.resize((128,height_hp))
+        #このあと合成するとき用の高さ(幅は固定なのでx=0)
+        #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
+        x=0
+        if height_hp<=128:
+            y=128-height_hp
+        else:
+            y=0
+        #hpゲージの画像を128x128で作成
+        img_bg.paste(img_hp,(x,y),img_hp)
+        #img_bg.save(buffer,format="PNG")
+
+        #上で作った画像と合成
+        img_bg.paste(overlay_img,(0,0),overlay_img)
+        img_bg.save(buffer,format="PNG")
+        buffer.seek(0)
+        st.image(buffer,width=128)
+
 #【画像】電荷の色
 #種類の取得
 #charge_imgs=[]*4
