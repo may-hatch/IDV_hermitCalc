@@ -7,6 +7,9 @@ streamlitで使えるようにするため、
 作成再開。
 画像表示が作成を難しくしているので、一度数値のみで作成する方針に変更
 
+2025-10-10
+数値のみでの動作を確認。
+
 """
 #作成日：2025/09/09
 
@@ -28,6 +31,7 @@ import streamlit as st
 #from io import BytesIO
 #import requests
 
+st.title("隠者戦HP計算機")
 #説明
 with st.expander("使い方"):
     st.write("""【試験中】
@@ -47,78 +51,84 @@ if "charge_type" not in st.session_state:
 if "charge_count" not in st.session_state:
     st.session_state["charge_count"]=[4,0,0]
 
-charge_types=list(st.session_state["charge_type"])
+for s  in range(4):
+    key_ctn=f"s{s+1}"
+    key_atk=f"attack_{s+1}"
+    key_hl=f"heal_{s+1}"
+    key_chg=f"charge_{s+1}"
+    with st.container(border=True):
+        col1,col2=st.columns(2)
+        with col2:
+            with st.container(key=key_ctn):
+                #攻撃ボタン(通常攻撃→1200)
+                if st.button("攻撃",key=key_atk):
+                    #対象となる極性を記録
+                    tgt_chg=st.session_state["charge_type"][s]
+                    #ダメージ算出
+                    if st.session_state["charge_type"][s]=="red":
+                        dmg=1200/int(st.session_state["charge_count"][1])
+                    elif st.session_state["charge_type"][s]=="blue":
+                        dmg=1200/int(st.session_state["charge_count"][2])
+                    else:
+                        dmg=1200
+                    #ダメージ反映
+                    for i in range(4):
+                        #電荷なかった時：本人だけにダメージ付与してfor終了
+                        if tgt_chg=="none":
+                            if st.session_state["hp"][s]+dmg>2000:
+                                st.session_state["hp"][s]=2000
+                            else:
+                                st.session_state["hp"][s]+=dmg
+                            #表示に反映
+                            st.session_state["hp_show"][s]=st.session_state["hp"][s]/1000
+                            break
+                        #電荷があった時：同じ属性ならダメージ、属性リセット
+                        if st.session_state["charge_type"][i]==tgt_chg:
+                            if st.session_state["hp"][i]+dmg>2000:
+                                st.session_state["hp"][i]=2000
+                            else:
+                                st.session_state["hp"][i]+=dmg
+                            #ダメージを付与して属性リセット
+                            st.session_state["charge_type"][i]="none"
+                            st.session_state["hp_show"][i]=st.session_state["hp"][i]/1000
+                    #いったん人数カウントを全部0に
+                    st.session_state["charge_count"]=[0,0,0]
+                    #人数カウントに反映
+                    for type in st.session_state["charge_type"]:
+                        if type=="none":
+                            st.session_state["charge_count"][0]+=1
+                        elif type=="red":
+                            st.session_state["charge_count"][1]+=1
+                        else:
+                            st.session_state["charge_count"][2]+=1
 
-with st.container():
-    #攻撃ボタン(通常攻撃→1200)
-    if st.button("攻撃",key="attack_1"):
-        #ダメージ算出
-        if st.session_state["charge_type"][0]=="red":
-            dmg=1200/int(st.session_state["charge_count"][1])
-        elif st.session_state["charge_type"][0]=="blue":
-            dmg=1200/int(st.session_state["charge_count"][2])
-        else:
-            dmg=1200
-        #ダメージ反映
-        for i in range(4):
-            #電荷なかった時：本人だけにダメージ付与してfor終了
-            if st.session_state["charge_type"][0]=="none":
-                if st.session_state["hp"][0]+dmg>2000:
-                    st.session_state["hp"][0]=2000
-                else:
-                    st.session_state["hp"][0]+=dmg
-                #表示に反映
-                st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-                break
-            #電荷があった時：同じ属性ならダメージ、属性リセット
-            if st.session_state["charge_type"][i]==st.session_state["charge_type"][0]:
-                if st.session_state["hp"][i]+dmg>2000:
-                    st.session_state["hp"][i]=2000
-                else:
-                    st.session_state["hp"][i]+=dmg
-                #ダメージを付与して属性リセット
-                st.session_state["charge_type"][i]="none"
-                st.session_state["hp_show"][i]=st.session_state["hp"][i]/1000
-        #いったん人数カウントを全部0に
-        st.session_state["charge_count"]=[0,0,0]
-        #人数カウントに反映
-        for type in st.session_state["charge_type"]:
-            if type=="none":
-                st.session_state["charge_count"][0]+=1
-            elif type=="red":
-                st.session_state["charge_count"][1]+=1
-            else:
-                st.session_state["charge_count"][2]+=1
+                #治療ボタン(汎用性の都合で500ずつ)
+                if st.button("治療",key=key_hl):
+                    if st.session_state["hp"][s]>500:
+                        st.session_state["hp"][s]-=500
+                    else:
+                        st.session_state["hp"][s]=0
+                    st.session_state["hp_show"][s]=st.session_state["hp"][s]/1000
 
-    #治療ボタン(汎用性の都合で500ずつ)
-    if st.button("治療",key=f"heal_1"):
-        if st.session_state["hp"][0]>500:
-            st.session_state["hp"][0]-=500
-        else:
-            st.session_state["hp"][0]=0
-        st.session_state["hp_show"][0]=st.session_state["hp"][0]/1000
-
-    #電荷切り替えボタン
-    if st.button("切り替え",key=f"charge_button_1"):
-        if st.session_state["charge_type"][0]=="none":
-            st.session_state["charge_type"][0]="red"
-            st.session_state["charge_count"][0]-=1
-            st.session_state["charge_count"][1]+=1
-        elif st.session_state["charge_type"][0]=="red":
-            st.session_state["charge_type"][0]="blue"
-            st.session_state["charge_count"][1]-=1
-            st.session_state["charge_count"][2]+=1
-        else:
-            st.session_state["charge_type"][0]="none"
-            st.session_state["charge_count"][2]-=1
-            st.session_state["charge_count"][0]+=1
-
-#HPと電荷を表示
-for hp,hs,ct in zip(st.session_state["hp"],st.session_state["hp_show"],st.session_state["charge_type"]):
-    st.text(f"ダメージ：{hs}")
-    st.text(f"({hs})")
-    st.text(f"極性：{ct}")
-
+                #電荷切り替えボタン
+                if st.button("切り替え",key=key_chg):
+                    if st.session_state["charge_type"][s]=="none":
+                        st.session_state["charge_type"][s]="red"
+                        st.session_state["charge_count"][0]-=1
+                        st.session_state["charge_count"][1]+=1
+                    elif st.session_state["charge_type"][s]=="red":
+                        st.session_state["charge_type"][s]="blue"
+                        st.session_state["charge_count"][1]-=1
+                        st.session_state["charge_count"][2]+=1
+                    else:
+                        st.session_state["charge_type"][s]="none"
+                        st.session_state["charge_count"][2]-=1
+                        st.session_state["charge_count"][0]+=1
+        with col1:
+        #HPと電荷を表示
+            st.text(f"ダメージ：{st.session_state["hp"][s]}")
+            st.text(f"({st.session_state["hp_show"][s]})")
+            st.text(f"極性：{st.session_state["charge_type"][s]}")
 #！！！画像！！！
 #【画像】電荷の色
 #種類の取得
