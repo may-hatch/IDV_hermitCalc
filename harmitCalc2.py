@@ -10,6 +10,9 @@ streamlitで使えるようにするため、
 2025-10-10
 数値のみでの動作を確認。
 
+2025-10-13
+画像の動作を少々改善。
+
 """
 #作成日：2025/09/09
 
@@ -50,6 +53,28 @@ if "charge_type" not in st.session_state:
 #無、赤、青で人数カウント
 if "charge_count" not in st.session_state:
     st.session_state["charge_count"]=[4,0,0]
+
+#人数カウントの関数
+def update_charge_count():
+    st.session_state["charge_count"] = [0, 0, 0]
+    for t in st.session_state["charge_type"]:
+        if t == "none":
+            st.session_state["charge_count"][0] += 1
+        elif t == "red":
+            st.session_state["charge_count"][1] += 1
+        else:
+            st.session_state["charge_count"][2] += 1
+
+#画像読み込みの関数化・結果のキャッシュ
+@st.cache_resource
+def load_image_from_url(url):
+    return Image.open(BytesIO(requests.get(url).content)).convert("RGBA")
+#ずっと同じ枠・透明画像のキャッシュ
+#@st.cache_data
+#def 
+bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/blank.png"
+#img_bg=load_image_from_url(bg_url)
+
 
 for s  in range(4):
     key_ctn=f"s{s+1}"
@@ -113,116 +138,50 @@ for s  in range(4):
             if st.button("切り替え",key=key_chg):
                 if st.session_state["charge_type"][s]=="none":
                     st.session_state["charge_type"][s]="red"
-                    st.session_state["charge_count"][0]-=1
-                    st.session_state["charge_count"][1]+=1
                 elif st.session_state["charge_type"][s]=="red":
                     st.session_state["charge_type"][s]="blue"
-                    st.session_state["charge_count"][1]-=1
-                    st.session_state["charge_count"][2]+=1
                 else:
                     st.session_state["charge_type"][s]="none"
-                    st.session_state["charge_count"][2]-=1
-                    st.session_state["charge_count"][0]+=1
+                update_charge_count()
+        #表示エリア
         with st.container():
-        #HPと電荷を表示（文字）
-            st.text(f"ダメージ：{st.session_state["hp"][s]}")
-            st.text(f"({st.session_state["hp_show"][s]})")
-            st.text(f"極性：{st.session_state["charge_type"][s]}")
+            
+            #文字
+            with st.container(horizontal=True):
+            #HPを表示（文字）
+                st.text(f"ダメージ：{st.session_state["hp"][s]}")
+                st.text(f"({st.session_state["hp_show"][s]})")
+            
+            #画像
+            #HPと電荷を表示(画像)
+            buffer = BytesIO()
+            #【画像】極性
+            charge_url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{st.session_state["charge_type"][s]}.png"
+            #img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
+            overlay_img=load_image_from_url(charge_url)
 
-        #HPと電荷を表示(画像)
-        #【画像】極性
-        charge_url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{st.session_state["charge_type"][s]}.png"
-        img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
-        #【画像】枠
-        frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
-        img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
-        #【画像】重ねる
-        buffer = BytesIO()
-        #電荷、枠画像の合成
-        overlay_img=Image.alpha_composite(img_frame,img_charge)
-        #上レイヤーを保存
-        #overlay_img.save(buffer,format="PNG")
-
-        #【画像】hpゲージの表示
-        #hp用元画像の取得
-        img_hp_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/hp_show.png"
-        img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
-        #画像サイズを合わせるために透明背景画像を利用
-        bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/none.png"
-        img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
-        #高さ計算用にhp数値取得
-        #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
-        height_hp=int(round(st.session_state["hp_show"][s]*64))+1
-        img_hp.resize((128,height_hp))
-        #このあと合成するとき用の高さ(幅は固定なのでx=0)
-        #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
-        x=0
-        if height_hp<=128:
-            y=128-height_hp
-        else:
-            y=0
-        #hpゲージの画像を128x128で作成
-        img_bg.paste(img_hp,(x,y),img_hp)
-        #img_bg.save(buffer,format="PNG")
-
-        #上で作った画像と合成
-        img_bg.paste(overlay_img,(0,0),overlay_img)
-        img_bg.save(buffer,format="PNG")
-        buffer.seek(0)
-        st.image(buffer,width=128)
-
-#【画像】電荷の色
-#種類の取得
-#charge_imgs=[]*4
-#参照URLの決定、画像の取得・集約
-#for (ct,ci) in zip(charge_types,charge_imgs):
-#    charge_url = f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{ct}.png"
-#    img_charge=Image.open(BytesIO(requests.get(charge_url).content)).convert("RGBA")
-#    ci=img_charge
-
-#【画像】枠
-#frame_url = "https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/frame.png"
-#img_frame=Image.open(BytesIO(requests.get(frame_url).content)).convert("RGBA")
-
-#【画像】重ねる
-#buffer = BytesIO()
-#overlay_imgs=[]*4
-#電荷、枠画像の合成
-#for cha,over in zip(charge_imgs,overlay_imgs):
-#    img_marged=Image.alpha_composite(img_frame,cha)
-#合成した上レイヤーのバッファへの保存(表示はまだ)
-#    over=img_marged
-
-#【画像】hpゲージの表示
-#hp用元画像の取得
-#img_hp_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/hp_show.png"
-#img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
-#画像サイズを合わせるために透明背景画像を利用
-#bg_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/none.png"
-#img_bg=Image.open(BytesIO(requests.get(bg_url).content)).convert("RGBA")
-
-#list_height=[]
-#高さ計算用にhp数値取得
-#HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
-#for i in range(0,4):
-#    num_hp=st.session_state["hp_show"][i]
-#    height_hp=int(round(num_hp*64))+1
-#    img_hp.resize((128,height_hp))
-#このあと合成するとき用の高さ(幅は固定なのでx=0)
-#128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
-#    x=0
-#    if height_hp<=128:
-#        y=128-height_hp
-#    else:
-#        y=0
-#    list_height.append(y)
-#hpゲージの画像を128x128で作成
-#    img_bg.paste(img_hp,(x,y),img_hp)
-#    img_bg.save(buffer,format="PNG")
-
-#for final_img in overlay_imgs:
-#上で作った画像と合成
-#    img_bg.paste(final_img,(0,0),final_img)
-#    img_bg.save(buffer,format="PNG")
-#    buffer.seek(0)
-#    st.image(buffer,width=128)
+            #【画像】hpゲージの表示
+            #hp用元画像の取得
+            img_hp_url="https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/hp_show.png"
+            #img_hp=Image.open(BytesIO(requests.get(img_hp_url).content)).convert("RGBA")
+            img_hp=load_image_from_url(img_hp_url)
+            #高さ計算用にhp数値取得
+            #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
+            height_hp=int(round(st.session_state["hp_show"][s]*64))+1
+            img_hp=img_hp.resize((128,height_hp))
+            #このあと合成するとき用の高さ(幅は固定なのでx=0)
+            #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
+            x=0
+            if height_hp<=128:
+                y=128-height_hp
+            else:
+                y=0
+            img_bg=load_image_from_url(bg_url)
+            #hpゲージの画像を128x128で作成
+            img_bg.paste(img_hp,(x,y),img_hp)
+            
+            #上で作った画像と合成
+            img_bg.paste(overlay_img,(0,0),overlay_img)
+            img_bg.save(buffer,format="PNG")
+            buffer.seek(0)
+            st.image(buffer,width=128)
