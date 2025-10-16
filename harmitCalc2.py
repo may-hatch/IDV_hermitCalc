@@ -55,6 +55,18 @@ def estimate_hp():
         else:
             st.session_state["hp_estimate"][e]=1200
 
+def count_charge():
+    #いったん人数カウントを全部0に
+    st.session_state["charge_count"]=[0,0,0]
+    #人数カウントに反映
+    for type in st.session_state["charge_type"]:
+        if type=="none":
+            st.session_state["charge_count"][0]+=1
+        elif type=="red":
+            st.session_state["charge_count"][1]+=1
+        else:
+            st.session_state["charge_count"][2]+=1
+
 @st.cache_data
 def img_from_url(tag):
     url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{tag}.png"
@@ -92,7 +104,9 @@ with st.container(horizontal=True):
         key_ctn=f"s{s+1}"
         key_atk=f"attack_{s+1}"
         key_hl=f"heal_{s+1}"
-        key_chg=f"charge_{s+1}"
+        key_red=f"red_{s+1}"
+        key_blue=f"blue_{s+1}"
+        key_none=f"none_{s+1}"
         with st.container(key=key_ctn):
             #HPを表示（文字）
             with st.container():
@@ -178,16 +192,7 @@ with st.container(horizontal=True):
                             #ダメージを付与して属性リセット
                             st.session_state["charge_type"][i]="none"
                             st.session_state["hp_show"][i]=st.session_state["hp"][i]/1000
-                    #いったん人数カウントを全部0に
-                        st.session_state["charge_count"]=[0,0,0]
-                    #人数カウントに反映
-                    for type in st.session_state["charge_type"]:
-                        if type=="none":
-                            st.session_state["charge_count"][0]+=1
-                        elif type=="red":
-                            st.session_state["charge_count"][1]+=1
-                        else:
-                            st.session_state["charge_count"][2]+=1
+                    count_charge()
                     estimate_hp()
                     st.rerun()
 
@@ -201,18 +206,19 @@ with st.container(horizontal=True):
                     estimate_hp()
 
             #電荷切り替えボタン
-            if st.button("切り替え",key=key_chg):
-                if st.session_state["charge_type"][s]=="none":
+            with st.container(horizontal=True):
+                if st.button("赤",key=key_red):
                     st.session_state["charge_type"][s]="red"
-                    st.session_state["charge_count"][0]-=1
-                    st.session_state["charge_count"][1]+=1
-                elif st.session_state["charge_type"][s]=="red":
+                    count_charge()
+                    estimate_hp()
+                    st.rerun()
+                if st.button("青",key=key_blue):
                     st.session_state["charge_type"][s]="blue"
-                    st.session_state["charge_count"][1]-=1
-                    st.session_state["charge_count"][2]+=1
-                else:
+                    count_charge()
+                    estimate_hp()
+                    st.rerun()
+                if st.button("無",key=key_none):
                     st.session_state["charge_type"][s]="none"
-                    st.session_state["charge_count"][2]-=1
-                    st.session_state["charge_count"][0]+=1
-                estimate_hp()
-                st.rerun()
+                    count_charge()
+                    estimate_hp()
+                    st.rerun()
