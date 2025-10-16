@@ -172,10 +172,9 @@ with st.container(horizontal=True):
                     st.session_state["charge_count"][2]-=1
                     st.session_state["charge_count"][0]+=1
 
-            #HPと電荷を表示（文字）
+            #HPを表示（文字）
             with st.container():
-                st.text(f"ダメージ：{st.session_state["hp"][s]}")
-                st.text(f"({st.session_state["hp_show"][s]})")
+                st.text(f"恐怖値:{st.session_state["hp"][s]}({st.session_state["hp_show"][s]})")
 
     #HPと電荷を表示(画像)
             buffer = BytesIO()
