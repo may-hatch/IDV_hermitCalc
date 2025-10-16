@@ -58,12 +58,52 @@ if "charge_type" not in st.session_state:
 if "charge_count" not in st.session_state:
     st.session_state["charge_count"]=[4,0,0]
 
-for s  in range(4):
-    key_ctn=f"s{s+1}"
-    key_atk=f"attack_{s+1}"
-    key_hl=f"heal_{s+1}"
-    key_chg=f"charge_{s+1}"
-    with st.container(border=True,horizontal=True):
+#画像表示
+def show_images():
+    with st.container(horizontal=True):
+        for s in range(4):          
+            #HPと電荷を表示(画像)
+            buffer = BytesIO()
+            #【画像】枠・極性
+            overlay_img=img_from_url(st.session_state["charge_type"][s])
+            overlay_img.save(buffer,format="PNG")
+            buffer.seek(0)
+
+            #【画像】hpゲージの表示
+            #hp用元画像の取得
+            img_hp=img_from_url("hp_show")
+            #画像サイズを合わせるために透明背景画像を利用
+            img_bg=img_from_url("blank")
+            #高さ計算用にhp数値取得
+            #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
+            height_hp=int(round(st.session_state["hp_show"][s]*64))+1
+            #HPゲージの高さを調整
+            img_hp.resize((128,height_hp))
+            #このあと合成するとき用の高さ(幅は固定なのでx=0)
+            #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
+            x=0
+            if height_hp<=128:
+                y=128-height_hp
+            else:
+                y=0
+            #hpゲージの画像を128x128で作成
+            img_bg.paste(img_hp,(x,y),img_hp)
+            img_bg.save(buffer,format="PNG")
+            buffer.seek(0)
+
+            #枠・極性と合成
+            img_bg.paste(overlay_img,(0,0),overlay_img)
+            img_bg.save(buffer,format="PNG")
+            buffer.seek(0)
+            st.image(buffer,width=128)
+
+#全体のボタンや数値表示の管理(自動実行)
+with st.container(horizontal=True):
+    for s  in range(4):
+        key_ctn=f"s{s+1}"
+        key_atk=f"attack_{s+1}"
+        key_hl=f"heal_{s+1}"
+        key_chg=f"charge_{s+1}"
         with st.container(key=key_ctn):
             with st.container(horizontal=True):
                 #攻撃ボタン(通常攻撃→1200)
@@ -130,43 +170,8 @@ for s  in range(4):
                     st.session_state["charge_type"][s]="none"
                     st.session_state["charge_count"][2]-=1
                     st.session_state["charge_count"][0]+=1
-        with st.container():
-        #HPと電荷を表示（文字）
-            st.text(f"ダメージ：{st.session_state["hp"][s]}")
-            st.text(f"({st.session_state["hp_show"][s]})")
-            st.text(f"極性：{st.session_state["charge_type"][s]}")
-
-        #HPと電荷を表示(画像)
-        buffer = BytesIO()
-        #【画像】枠・極性
-        overlay_img=img_from_url(st.session_state["charge_type"][s])
-        overlay_img.save(buffer,format="PNG")
-        buffer.seek(0)
-
-        #【画像】hpゲージの表示
-        #hp用元画像の取得
-        img_hp=img_from_url("hp_show")
-        #画像サイズを合わせるために透明背景画像を利用
-        img_bg=img_from_url("blank")
-        #高さ計算用にhp数値取得
-        #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
-        height_hp=int(round(st.session_state["hp_show"][s]*64))+1
-        #HPゲージの高さを調整
-        img_hp.resize((128,height_hp))
-        #このあと合成するとき用の高さ(幅は固定なのでx=0)
-        #128pxを超えてしまうときは元ゲームの仕様も加味して128pxに固定
-        x=0
-        if height_hp<=128:
-            y=128-height_hp
-        else:
-            y=0
-        #hpゲージの画像を128x128で作成
-        img_bg.paste(img_hp,(x,y),img_hp)
-        img_bg.save(buffer,format="PNG")
-        buffer.seek(0)
-
-        #枠・極性と合成
-        img_bg.paste(overlay_img,(0,0),overlay_img)
-        img_bg.save(buffer,format="PNG")
-        buffer.seek(0)
-        st.image(buffer,width=128)
+            #HPと電荷を表示（文字）
+            with st.container():
+                st.text(f"ダメージ：{st.session_state["hp"][s]}")
+                st.text(f"({st.session_state["hp_show"][s]})")
+show_images()
