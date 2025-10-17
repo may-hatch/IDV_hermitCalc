@@ -12,6 +12,7 @@ streamlitで使えるようにするため、
 
 2025-10-16
 キャッシュで速度を改善。
+UIを調整。
 
 """
 #作成日：2025/09/09
@@ -41,8 +42,6 @@ with st.expander("使い方・更新予定"):
              【更新予定】
              ★表示
                 次の攻撃の超過ダメージ
-             ★UI調整
-                切り替えボタンを「赤」「青」「無」の三つに変更
              ★機能調整
                 通電後および恐怖の一撃への対応
              """)
@@ -204,6 +203,7 @@ with st.container(horizontal=True):
                         st.session_state["hp"][s]=0
                     st.session_state["hp_show"][s]=st.session_state["hp"][s]/1000
                     estimate_hp()
+                    st.rerun()
 
             #電荷切り替えボタン
             with st.container(horizontal=True):
