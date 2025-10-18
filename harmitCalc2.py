@@ -34,26 +34,39 @@ from PIL import Image
 from io import BytesIO
 import requests
 import time
+import threading
 
 #説明
 with st.expander("使い方・更新予定"):
-    st.write("""
-             第五人格の隠者戦においてHPを数値で確認するためのツール。
-             【更新予定】
-             ★表示
-                次の攻撃の超過ダメージ
-             ★機能調整
-                通電後および恐怖の一撃への対応
-             """)
+    st.text("""
+            隠者戦でHPを数値で確認するためのツール。
+            画像読込の都合上、起動は少し時間がかかります。
+            【予定】
+            修正：
+                複数人いる場合の余剰ダメージの計算
+            【履歴】
+            2025-10-18
+                治療時に表示が更新されるように修正。
+                引き留める・恐怖に対応する用のスイッチを追加。
+                余剰ダメ表示を仮実装。
+            2025-10-16
+                キャッシュで速度を改善。
+                UIを調整。
+            2025-10-10
+                簡易的に動作を確認。
+            """)
+    
+#【関数】予測
 def estimate_hp():
     for e in range(4):
         if st.session_state["charge_type"][e]=="red":
-            st.session_state["hp_estimate"][e]=1200/int(st.session_state["charge_count"][1])
+            st.session_state["hp_estimate"][e]=st.session_state["damage_full"]/int(st.session_state["charge_count"][1])
         elif st.session_state["charge_type"][e]=="blue":
-            st.session_state["hp_estimate"][e]=1200/int(st.session_state["charge_count"][2])
+            st.session_state["hp_estimate"][e]=st.session_state["damage_full"]/int(st.session_state["charge_count"][2])
         else:
-            st.session_state["hp_estimate"][e]=1200
+            st.session_state["hp_estimate"][e]=st.session_state["damage_full"]
 
+#【関数】人数カウント
 def count_charge():
     #いったん人数カウントを全部0に
     st.session_state["charge_count"]=[0,0,0]
@@ -66,12 +79,22 @@ def count_charge():
         else:
             st.session_state["charge_count"][2]+=1
 
+#【関数】画像をキャッシュ
 @st.cache_data
 def img_from_url(tag):
     url=f"https://raw.githubusercontent.com/may-hatch/IDV_hermitCalc/main/assets/{tag}.png"
     return Image.open(BytesIO(requests.get(url).content)).convert("RGBA")
 
-#session_stateで管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
+#【関数】タイマー
+def skill_timer(CT):
+    CoolTime=1
+    CT_bar=st.sidebar.progress(1)
+    for timer in range(CT):
+        CoolTime=(CT-timer)/CT
+        CT_bar.progress(CoolTime)
+        time.sleep(0.9)
+
+#【データ】session_stateで管理するもの：hp(0~2000),hp_show(hp/1000) charge_type(電荷)
 if "hp" not in st.session_state:
     st.session_state["hp"]=[0,0,0,0]
 if "hp_show" not in st.session_state:
@@ -81,24 +104,64 @@ if "charge_type" not in st.session_state:
 #無、赤、青で人数カウント
 if "charge_count" not in st.session_state:
     st.session_state["charge_count"]=[4,0,0]
-#予測ダメージ量(機能未実装)
+#予測ダメージ量
 if "hp_estimate" not in st.session_state:
     st.session_state["hp_estimate"]=[0,0,0,0]
+#通常攻撃によるダメージ量
+if "damage_full" not in st.session_state:
+    st.session_state["damage_full"]=1200
 
-st.sidebar.text("メモ(機能未実装)")
-st.sidebar.toggle("引き留める")
-st.sidebar.selectbox("【特質】",["神出鬼没","瞬間移動","移形","異常","監視者","巡視者","リッスン"])
+#サイドバー
 with st.container():
-    st.sidebar.button("CTカウント")
-st.sidebar.text("【人格】")
-with st.container():
-    st.sidebar.checkbox("閉鎖空間")
-    st.sidebar.checkbox("裏向きカード")
-    st.sidebar.checkbox("引き留める")
-    st.sidebar.checkbox("傲慢")
+    st.sidebar.text("メモ(機能未実装)")
+    skill=st.sidebar.selectbox("【特質】",["神出鬼没","瞬間移動","移形","異常","巡視者","監視者","リッスン"])
+    if skill=="神出鬼没":
+        CT_full=150
+    elif skill=="瞬間移動"or skill=="移形":
+        CT_full=100
+    elif skill=="異常"or skill=="巡視者":
+        CT_full=90
+    else:
+        CT_full=0
+    #with st.container():
+    #    if st.sidebar.button("CTカウント(目安)",key="button_timer"):
+    #        tm=threading.Thread(skill_timer(CT_full))
+    #        tm.start()
+
+    st.sidebar.markdown("**【人格】**")
+    with st.container():
+        st.sidebar.checkbox("閉鎖空間")
+        st.sidebar.checkbox("裏向きカード")
+        st.sidebar.checkbox("引き留める")
+        st.sidebar.checkbox("傲慢")
+
+#リセット、引き留める
+with st.container(horizontal=True):
+    if st.button("リセット"):
+        st.session_state.clear()
+        st.rerun()
+    
+    noOne=st.toggle("引き留める/恐怖")
+    if noOne:
+        st.session_state["damage_full"]=2200
+        estimate_hp()
+    else:
+        st.session_state["damage_full"]=1200
+        estimate_hp()
+
+#攻撃対象、予測余剰ダメ
+with st.container(horizontal=True):
+    with st.container(border=True,width=140):
+        chase=st.selectbox("次の攻撃対象：",[1,2,3,4],width=100)
+    over=1200-(2000-st.session_state["hp"][chase-1])
+    if over<=0 or over>=1200:
+        over=0
+    st.markdown(f"**余剰：{over}({round(over/1000,2)})**")
 
 #全体のボタンや数値表示の管理(自動実行)
 with st.container(horizontal=True):
+    img_from_url("red")
+    img_from_url("blue")
     for s in range(4):
         key_ctn=f"s{s+1}"
         key_atk=f"attack_{s+1}"
@@ -107,10 +170,6 @@ with st.container(horizontal=True):
         key_blue=f"blue_{s+1}"
         key_none=f"none_{s+1}"
         with st.container(key=key_ctn):
-            #HPを表示（文字）
-            with st.container():
-                st.text(f"恐怖値:{st.session_state["hp"][s]}({st.session_state["hp_show"][s]})")
-
     #HPと電荷を表示(画像)
             buffer = BytesIO()
             #【画像】枠・極性
@@ -157,8 +216,11 @@ with st.container(horizontal=True):
             img_bg.save(buffer,format="PNG")
             buffer.seek(0)
             st.image(buffer,width=128)
-
             
+            #HPを表示（文字）
+            with st.container():
+                st.text(f"恐怖値：{st.session_state["hp"][s]}({st.session_state["hp_show"][s]})")
+
             with st.container(horizontal=True):
                 #攻撃ボタン(通常攻撃→1200)
                 if st.button("攻撃",key=key_atk):
@@ -166,11 +228,11 @@ with st.container(horizontal=True):
                     tgt_chg=st.session_state["charge_type"][s]
                     #ダメージ算出
                     if st.session_state["charge_type"][s]=="red":
-                        dmg=1200/int(st.session_state["charge_count"][1])
+                        dmg=int(st.session_state["damage_full"]/int(st.session_state["charge_count"][1]))
                     elif st.session_state["charge_type"][s]=="blue":
-                        dmg=1200/int(st.session_state["charge_count"][2])
+                        dmg=int(st.session_state["damage_full"]/int(st.session_state["charge_count"][2]))
                     else:
-                        dmg=1200
+                        dmg=st.session_state["damage_full"]
                     #ダメージ反映
                     for i in range(4):
                         #電荷なかった時：本人だけにダメージ付与してfor終了
@@ -197,10 +259,10 @@ with st.container(horizontal=True):
 
                 #治療ボタン(汎用性の都合で500ずつ)
                 if st.button("治療",key=key_hl):
-                    if st.session_state["hp"][s]>500:
-                        st.session_state["hp"][s]-=500
+                    if st.session_state["hp"][s]>1000:
+                        st.session_state["hp"][s]-=1000
                     else:
-                        st.session_state["hp"][s]=0
+                        pass
                     st.session_state["hp_show"][s]=st.session_state["hp"][s]/1000
                     estimate_hp()
                     st.rerun()
