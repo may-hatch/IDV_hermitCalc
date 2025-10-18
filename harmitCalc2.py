@@ -41,9 +41,38 @@ with st.expander("使い方・更新予定"):
     st.text("""
             隠者戦でHPを数値で確認するためのツール。
             画像読込の都合上、起動は少し時間がかかります。
-            【予定】
-            高速化
+
+            【使い方】
+            ★メイン機能
+                リセット：
+                    完全リセット。
+                ひとつ戻る：
+                    最後に押した攻撃もしくは治療を取り消します。
+                    現時点では電極は戻らない&ひとつしか戻れないので注意。
+                攻撃対象：
+                    余剰ダメージを表示するための選択ボタン。
+                    左上、右上、左下、右下の順に対応。
+                    次の攻撃でダウンする場合、
+                    「何ダメージ分消失するか」が余剰ダメージです。
+                引き留める/恐怖：
+                    トグルがオンの間、攻撃ボタンのダメージが2.2になります。
+                赤/青/無ボタン：
+                    極性の切り替え。
+                攻撃/治療ボタン：
+                    各ボタンの真上にあるゲージを増減。
+                    同じ極性がいる場合は自動で他の人にも反映されます。
+            ★サイドバー
+                スキルのメモ用。今後スキルタイマー機能を合わせてつける予定。
+
+            【作業予定リスト】
+            ひとつ戻るボタンの調整
+            ひとつ進むボタンの実装
+            UI調整
+            スキルタイマー実装
+
             【履歴】
+            2025-10-19
+                ひとつ戻るボタンを仮実装。
             2025-10-18
                 治療時に表示が更新されるように修正。
                 引き留める・恐怖に対応する用のスイッチを追加。
@@ -78,6 +107,21 @@ def count_charge():
         else:
             st.session_state["charge_count"][2]+=1
 
+#【関数】ひとつ戻る
+def undo():
+    if st.session_state["last_operation"][0]=="attack":
+        for h in range(4):
+            st.session_state["hp"][h]=st.session_state["last_operation"][h+2]
+        estimate_hp()
+        count_charge()
+        st.rerun()
+    elif st.session_state["last_operation"][0]=="cure":
+        charanum=st.session_state["last_operation"][1]
+        st.session_state["hp"][charanum]=st.session_state["last_operation"][charanum+2]
+        estimate_hp()
+        count_charge()
+        st.rerun()
+
 #【関数】画像をキャッシュ
 @st.cache_data
 def img_from_url(tag):
@@ -109,6 +153,10 @@ if "hp_estimate" not in st.session_state:
 #通常攻撃によるダメージ量
 if "damage_full" not in st.session_state:
     st.session_state["damage_full"]=1200
+#ひとつ戻る用：最後に行った操作を記録
+#操作種別(攻撃or治療)、キャラ番号、HP１～４
+if "last_operation" not in st.session_state:
+    st.session_state["last_operation"]=["",0,0,0,0,0]
 
 #サイドバー
 with st.container():
@@ -139,6 +187,8 @@ with st.container(horizontal=True):
     if st.button("リセット"):
         st.session_state.clear()
         st.rerun()
+    if st.button("ひとつ戻る"):
+        undo()
 
 #攻撃対象、予測余剰ダメ
 with st.container(horizontal=True):
@@ -199,6 +249,8 @@ with st.container(horizontal=True):
             img_bg=img_from_url("blank")
             #高さ計算用にhp数値取得
             #HPゲージ用画像の高さを計算(エラー対策で必ず+1px表示)
+            st.session_state["hp_show"][s]=st.session_state["hp"][s]/1000
+            estimate_hp()
             height_hp=int(round(st.session_state["hp_show"][s]*64))+1
             height_est=height_hp+int(round(st.session_state["hp_estimate"][s]/1000*64))
             #HPゲージの高さを調整
@@ -237,6 +289,13 @@ with st.container(horizontal=True):
             with st.container(horizontal=True):
                 #攻撃ボタン(通常攻撃→1200)
                 if st.button("攻撃",key=key_atk):
+                    #戻せるように状態を記録：
+                    st.session_state["last_operation"][0]="attack"
+                    st.session_state["last_operation"][1]=int(s)
+                    st.session_state["last_operation"][2]=st.session_state["hp"][0]
+                    st.session_state["last_operation"][3]=st.session_state["hp"][1]
+                    st.session_state["last_operation"][4]=st.session_state["hp"][2]
+                    st.session_state["last_operation"][5]=st.session_state["hp"][3]
                     #対象となる極性を記録
                     tgt_chg=st.session_state["charge_type"][s]
                     #ダメージ算出
@@ -272,6 +331,14 @@ with st.container(horizontal=True):
 
                 #治療ボタン(汎用性の都合で500ずつ)
                 if st.button("治療",key=key_hl):
+                    #戻せるように状態を記録：
+                    st.session_state["last_operation"][0]="attack"
+                    st.session_state["last_operation"][1]=int(s)
+                    st.session_state["last_operation"][2]=st.session_state["hp"][0]
+                    st.session_state["last_operation"][3]=st.session_state["hp"][1]
+                    st.session_state["last_operation"][4]=st.session_state["hp"][2]
+                    st.session_state["last_operation"][5]=st.session_state["hp"][3]
+                    #１ダメ以上の時のみ治療可。
                     if st.session_state["hp"][s]>1000:
                         st.session_state["hp"][s]-=1000
                     else:
