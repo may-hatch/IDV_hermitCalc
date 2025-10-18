@@ -42,8 +42,7 @@ with st.expander("使い方・更新予定"):
             隠者戦でHPを数値で確認するためのツール。
             画像読込の都合上、起動は少し時間がかかります。
             【予定】
-            修正：
-                複数人いる場合の余剰ダメージの計算
+            高速化
             【履歴】
             2025-10-18
                 治療時に表示が更新されるように修正。
@@ -104,7 +103,7 @@ if "charge_type" not in st.session_state:
 #無、赤、青で人数カウント
 if "charge_count" not in st.session_state:
     st.session_state["charge_count"]=[4,0,0]
-#予測ダメージ量
+#予測ダメージ量(0~2000)
 if "hp_estimate" not in st.session_state:
     st.session_state["hp_estimate"]=[0,0,0,0]
 #通常攻撃によるダメージ量
@@ -140,23 +139,39 @@ with st.container(horizontal=True):
     if st.button("リセット"):
         st.session_state.clear()
         st.rerun()
-    
-    noOne=st.toggle("引き留める/恐怖")
-    if noOne:
-        st.session_state["damage_full"]=2200
-        estimate_hp()
-    else:
-        st.session_state["damage_full"]=1200
-        estimate_hp()
 
 #攻撃対象、予測余剰ダメ
 with st.container(horizontal=True):
     with st.container(border=True,width=140):
         chase=st.selectbox("次の攻撃対象：",[1,2,3,4],width=100)
-    over=1200-(2000-st.session_state["hp"][chase-1])
-    if over<=0 or over>=1200:
+
+    nextDamage=st.session_state["hp_estimate"][chase-1]
+    if nextDamage<=st.session_state["damage_full"]:
+        target_charge=st.session_state["charge_type"][chase-1]
+        if target_charge=="red":
+            cnt=st.session_state["charge_count"][1]
+        elif target_charge=="blue":
+            cnt=st.session_state["charge_count"][2]
+        else:
+            cnt=1
+        nextDamage=nextDamage*cnt
+        over=nextDamage-(2000-st.session_state["hp"][chase-1])
+        st.write(nextDamage,over,"条件分岐１")
+    else:
+        over=1200-(2000-st.session_state["hp"][chase-1])
+        st.write(over,"条件分岐２")
+    if over<=0:
         over=0
-    st.markdown(f"**余剰：{over}({round(over/1000,2)})**")
+
+    with st.container():
+        st.markdown(f"**余剰：{over}({round(over/1000,2)})**")
+        noOne=st.toggle("引き留める/恐怖")
+        if noOne:
+            st.session_state["damage_full"]=2200
+            estimate_hp()
+        else:
+            st.session_state["damage_full"]=1200
+            estimate_hp()
 
 #全体のボタンや数値表示の管理(自動実行)
 with st.container(horizontal=True):
