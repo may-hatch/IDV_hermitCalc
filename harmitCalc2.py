@@ -156,10 +156,8 @@ with st.container(horizontal=True):
             cnt=1
         nextDamage=nextDamage*cnt
         over=nextDamage-(2000-st.session_state["hp"][chase-1])
-        st.write(nextDamage,over,"条件分岐１")
     else:
         over=1200-(2000-st.session_state["hp"][chase-1])
-        st.write(over,"条件分岐２")
     if over<=0:
         over=0
 
