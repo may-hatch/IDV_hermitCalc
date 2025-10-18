@@ -67,6 +67,7 @@ with st.expander("使い方・更新予定"):
                 スキルのメモ用。今後スキルタイマー機能を合わせてつける予定。
 
             【作業予定リスト】
+            余剰ダメージの計算最適化
             ひとつ戻るボタンの調整
             ひとつ進むボタンの実装
             UI調整
@@ -114,12 +115,14 @@ def undo():
     if st.session_state["last_operation"][0]=="attack":
         for h in range(4):
             st.session_state["hp"][h]=st.session_state["last_operation"][h+2]
+            st.session_state["hp_show"][h]=round(st.session_state["hp"][h]/1000,2)
         estimate_hp()
         count_charge()
         st.rerun()
     elif st.session_state["last_operation"][0]=="cure":
         charanum=st.session_state["last_operation"][1]
         st.session_state["hp"][charanum]=st.session_state["last_operation"][charanum+2]
+        st.session_state["hp_show"][charanum]=round(st.session_state["hp"][charanum]/1000,2)
         estimate_hp()
         count_charge()
         st.rerun()
@@ -193,9 +196,9 @@ with st.container(horizontal=True):
         undo()
 
 #攻撃対象、予測余剰ダメ
-with st.container(horizontal=True,border=True):
+with st.container(horizontal=True):
     with st.container(border=True,width=140):
-        chase=st.selectbox("次の攻撃対象：",[1,2,3,4],width=100)
+        chase=st.radio("次の攻撃対象：",[1,2,3,4],width=130,horizontal=True)
 
     nextDamage=st.session_state["hp_estimate"][chase-1]
     if nextDamage<=st.session_state["damage_full"]:
@@ -286,9 +289,9 @@ with st.container(horizontal=True):
             
             #HPを表示（文字）
             with st.container():
-                st.text(f"恐怖値：{st.session_state["hp"][s]}({st.session_state["hp_show"][s]})")
+                st.markdown(f"恐怖値:{st.session_state["hp"][s]}（**{st.session_state["hp_show"][s]}**）")
 
-            with st.container(horizontal=True):
+            with st.container(horizontal=True,width=140):
                 #攻撃ボタン(通常攻撃→1200)
                 if st.button("攻撃",key=key_atk):
                     #戻せるように状態を記録：
@@ -350,18 +353,18 @@ with st.container(horizontal=True):
                     st.rerun()
 
             #電荷切り替えボタン
-            with st.container(horizontal=True):
-                if st.button("赤",key=key_red):
+            with st.container(horizontal=True,width=140):
+                if st.button("赤",key=key_red,width=30):
                     st.session_state["charge_type"][s]="red"
                     count_charge()
                     estimate_hp()
                     st.rerun()
-                if st.button("青",key=key_blue):
+                if st.button("青",key=key_blue,width=30):
                     st.session_state["charge_type"][s]="blue"
                     count_charge()
                     estimate_hp()
                     st.rerun()
-                if st.button("無",key=key_none):
+                if st.button("無",key=key_none,width=30):
                     st.session_state["charge_type"][s]="none"
                     count_charge()
                     estimate_hp()
