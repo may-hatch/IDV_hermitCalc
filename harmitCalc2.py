@@ -43,6 +43,8 @@ with st.expander("使い方・更新予定"):
             画像読込の都合上、起動は少し時間がかかります。
 
             【使い方】
+            茶色のゲージが次の攻撃で食らう分、黄色がすでに食らった分です。
+            赤・青はゲーム内と同様に表示されます。
             ★メイン機能
                 リセット：
                     完全リセット。
@@ -191,7 +193,7 @@ with st.container(horizontal=True):
         undo()
 
 #攻撃対象、予測余剰ダメ
-with st.container(horizontal=True):
+with st.container(horizontal=True,border=True):
     with st.container(border=True,width=140):
         chase=st.selectbox("次の攻撃対象：",[1,2,3,4],width=100)
 
