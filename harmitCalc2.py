@@ -67,8 +67,9 @@ with st.expander("隠者戦HP計算ツール：説明"):
                 ★サイドバー
                     スキルのメモ用。今後スキルタイマー機能を合わせてつける予定。""")
 
-    with st.expander("【作業予定・更新履歴】"):
+    with st.expander("【作業予定・履歴・他】"):
         st.text("""
+                【予定】
                 ひとつ進むボタンの実装
                 UI調整
                 スキルタイマー実装
@@ -86,6 +87,11 @@ with st.expander("隠者戦HP計算ツール：説明"):
                     UIを調整。
                 2025-10-10
                     簡易的に動作を確認。
+                
+                【他】
+                コード見たい人は↓
+                https://github.com/may-hatch/IDV_hermitCalc/blob/main/harmitCalc2.py
+                ※思い付きで書き続けてるのですごく読みにくいよ
                 """)
     
 #【関数】予測
