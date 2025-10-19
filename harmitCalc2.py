@@ -344,7 +344,7 @@ with st.container(horizontal=True):
                     st.session_state["last_operation"][4]=st.session_state["hp"][2]
                     st.session_state["last_operation"][5]=st.session_state["hp"][3]
                     #１ダメ以上の時のみ治療可。
-                    if st.session_state["hp"][s]>=1000:
+                    if st.session_state["hp"][s]>999:
                         st.session_state["hp"][s]-=1000
                     else:
                         pass
