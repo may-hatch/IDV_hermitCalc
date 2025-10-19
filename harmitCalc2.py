@@ -347,18 +347,18 @@ with st.container(horizontal=True):
                     st.rerun()
 
             #電荷切り替えボタン
-            with st.container(horizontal=True,width=140):
-                if st.button("赤",key=key_red,width=30):
+            with st.container(horizontal=True):
+                if st.button("赤",key=key_red):
                     st.session_state["charge_type"][s]="red"
                     count_charge()
                     estimate_hp()
                     st.rerun()
-                if st.button("青",key=key_blue,width=30):
+                if st.button("青",key=key_blue):
                     st.session_state["charge_type"][s]="blue"
                     count_charge()
                     estimate_hp()
                     st.rerun()
-                if st.button("無",key=key_none,width=30):
+                if st.button("無",key=key_none):
                     st.session_state["charge_type"][s]="none"
                     count_charge()
                     estimate_hp()
